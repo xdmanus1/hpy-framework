@@ -1,0 +1,38 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=61.0"] # Specify the build tool and minimum version
+build-backend = "setuptools.build_meta" # Standard build backend for setuptools
+
+[project]
+name = "hpy-tool" # The name used for installation (pip install hpy-tool)
+version = "0.1.2" # Sync this with your script's __version__
+authors = [
+  { name="Your Name", email="your.email@example.com" }, # Replace with your details
+]
+description = "A tool to build web apps from .hpy files using Brython."
+readme = "README.md" # Optional: if you have a README file
+requires-python = ">=3.8" # Specify minimum Python version (consider 3.7 for SimpleHTTPRequestHandler dir kwarg if needed, but 3.8+ is safer now)
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License", # Choose your license (e.g., MIT)
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Framework :: Brython", # Custom classifier
+]
+dependencies = [
+    # List runtime dependencies here
+    # Watchdog is optional, but needed for the --watch flag.
+    # We can make it optional later if desired, but for now, include it.
+    'watchdog >= 2.0.0 ; sys_platform != "win32"', # Standard watchdog
+    'watchdog[watchmedo] >= 2.0.0 ; sys_platform == "win32"', # Recommended for Windows event handling
+]
+# Optional: Add URLs for homepage, repository etc.
+# [project.urls]
+# "Homepage" = "https://github.com/yourusername/hpy-framework"
+# "Bug Tracker" = "https://github.com/yourusername/hpy-framework/issues"
+
+[project.scripts]
+# This creates the command-line script 'hpy' that runs the main function
+hpy = "hpy_tool:main"

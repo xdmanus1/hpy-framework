@@ -1,0 +1,91 @@
+ <html>
+        <div id="app">
+            <h1>Hello, HPY Framework!</h1>
+            <button id="counter-btn">Clicked: 0 times</button>
+            <div class="card">
+                <input id="name-input" type="text" placeholder="Enter your name">
+                <div id="greeting"></div>
+            </div>
+        </div>
+    </html>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        #app {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .card {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        input {
+            padding: 8px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+<python>
+# --- Start Python code HERE, with NO leading spaces/tabs on this line ---
+from browser import document, html
+
+# Counter functionality
+count = 0 # This should be at the base indentation level (0)
+
+def update_counter(event):
+    # Code inside functions/classes is indented relative to the def/class line
+    global count
+    count += 1
+    document["counter-btn"].text = f"Clicked: {count} times"
+
+# This top-level call should also be at base indentation level (0)
+document["counter-btn"].bind("click", update_counter)
+
+# Name input functionality
+def update_greeting(event):
+    name = document["name-input"].value
+    if name:
+        document["greeting"].html = f"<p>Hello, <strong>{name}</strong>! Welcome to HPY Framework.</p>"
+    else:
+        document["greeting"].html = ""
+
+document["name-input"].bind("input", update_greeting)
+
+# Add a dynamic element using Brython's html module
+document["app"] <= html.P("This paragraph was dynamically added with Brython!")
+# --- End Python code ---
+</python>
