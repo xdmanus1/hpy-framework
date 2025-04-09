@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/hpy-tool.svg?style=flat-square)](https://pypi.org/project/hpy-tool/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-**A simple command-line tool to build interactive web applications from single `.hpy` files (HTML + CSS + Python) using the magic of [Brython](https://brython.info)! ✨**
+**A simple command-line tool to build interactive web applications from single `.hpy` files (HTML + CSS + Python) using the magic of [Brython](https://brython.info)!  ✨**
 
 Write your entire web component – structure, style, and logic – in one `.hpy` file and let `hpy-tool` bundle it into a ready-to-run HTML application where your Python code executes directly in the browser.
 
