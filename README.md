@@ -1,116 +1,174 @@
-# HPY Tool ⚡
+# HPY Tool ⚡ v0.6.3
 
-[![PyPI version](https://img.shields.io/pypi/v/hpy-tool.svg?style=flat-square)](https://pypi.org/project/hpy-tool/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg?style=flat-square)](https://opensource.org/licenses/BSD-3-Clause) <!-- Updated License Badge -->
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg?style=flat-square)](https://www.python.org/downloads/)
+<!-- Optional: Add PyPI badge if published -->
+<!-- [![PyPI version](https://img.shields.io/pypi/v/hpy-tool.svg?style=flat-square)](https://pypi.org/project/hpy-tool/) -->
 
-**A simple command-line tool to build interactive web applications from single `.hpy` files (HTML + CSS + Python) using the magic of [Brython](https://brython.info)!  ✨**
+**Initialize, build, serve, and live-reload web applications from structured `.hpy` projects (HTML + CSS + Python) using the magic of [Brython](https://brython.info)! ✨**
 
-Write your entire web component – structure, style, and logic – in one `.hpy` file and let `hpy-tool` bundle it into a ready-to-run HTML application where your Python code executes directly in the browser.
+`hpy-tool` streamlines creating interactive web applications by processing `.hpy` files and directories. Define shared layouts and individual pages, keeping structure (`<html>`), styling (`<style>`), and client-side logic (`<python>`) organized. `hpy-tool` bundles everything into standard HTML files where your Python code runs directly in the browser, powered by Brython.
 
-Perfect for:
+Inspired by the simplicity of tools like SvelteKit, this tool aims to provide a straightforward development experience for Brython-based projects.
 
-*   Rapid prototyping of web ideas.
-*   Learning and experimenting with Brython.
-*   Small projects where you want everything in one place.
-*   Creating interactive examples or documentation snippets.
+## Project Status & Disclaimer
 
-## Features
+⚠️ **Please Note:** This project is currently maintained primarily as a learning exercise. While it aims to be functional and useful for the described use cases, it's still under development. There might be bugs, rough edges, or areas for improvement. Treat it as **experimental**. Feedback, bug reports, and contributions are highly encouraged!
 
-*   **Compile `.hpy`:** Parses `.hpy` files and generates a standalone `index.html`.
-*   **Brython Integration:** Automatically includes the Brython runtime and embeds your Python code correctly.
-*   **Development Server:** (`-s`) Serves your compiled app locally.
-*   **Live Reload:** (`-w`) Watches your `.hpy` file for changes and automatically rebuilds. Just refresh your browser! (Requires `watchdog`).
-*   **Configurable:** Specify output directory (`-o`) and server port (`-p`).
-*   **Verbose Mode:** (`-v`) Get detailed output during the build and server requests.
+## Core Features (v0.6.x)
+
+*   🚀 **Project Initialization:** (`--init`) Quickly scaffold a new project with a default layout and example pages.
+*   📁 **Directory-Based Workflow:** Process an entire source directory (`src/` by default) containing your layout and page files.
+*   📄 **Layout Support:** Define a global `_layout.hpy` for shared HTML structure, CSS, and Python logic. Page content is injected automatically.
+*   🧩 **Single-File Pages:** Write individual page content and logic in separate `.hpy` files within your source directory.
+*   🐍 **Brython Integration:** Automatically includes the Brython runtime and correctly embeds combined layout and page Python code.
+*   ⚙️ **Smart Compilation:** Builds HTML files corresponding to your source `.hpy` pages, applying the layout.
+*   🚀 **Development Server:** (`-s`, `-p`) Instantly serves your compiled application locally from the output directory with no-cache headers.
+*   🔄 **Live Rebuilding:** (`-w`) Automatically recompiles when source files change (requires `watchdog`). Uses a simple, robust strategy (layout/component change rebuilds all, page change rebuilds page).
+*   🗣️ **Verbose Mode:** (`-v`) Provides detailed logs for build steps and server activity.
+*   🔧 **Configurable:** Control the output directory (`-o`) and server port (`-p`).
+*   💡 **DOM Helpers:** Automatically injects `byid()`, `qs()`, `qsa()` helpers for cleaner Python DOM manipulation.
+*   🏗️ **Refactored Codebase:** Internal code organized into the `hpy_core` package for better maintainability.
+
+## Ideal For
+
+*   ⚡ Building small to medium-sized web applications or dashboards with Python in the browser.
+*   🎓 Learning and experimenting with Brython in a structured project setup.
+*   📦 Creating interactive documentation examples or simple UI components.
+*   ⚡ Rapid prototyping where code organization is helpful.
 
 ## Installation
 
-It's recommended to use a Python virtual environment.
+A Python virtual environment is strongly recommended.
 
 ```bash
-# 1. Create and activate a virtual environment (if you haven't already)
+# 1. Create and activate a virtual environment (if you haven't)
 python -m venv .venv
-source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
+# Linux/macOS:
+source .venv/bin/activate
+# Windows (CMD):
+# .venv\Scripts\activate.bat
+# Windows (PowerShell):
+# .venv\Scripts\Activate.ps1
 
-# 2. Install hpy-tool (from PyPI - placeholder for future)
+# 2. Install hpy-tool
+# Option A: From PyPI (once published)
 # pip install hpy-tool
 
-# OR: Install from local source for development (navigate to project dir first)
+# Option B: From local source code (for development)
+# Navigate to the directory containing pyproject.toml
 pip install -e .
+
+# Note: This installs 'watchdog' automatically as a dependency, needed for -w.
 ```
 
-This will also install necessary dependencies like `watchdog` if you plan to use the `-w` flag.
+## Getting Started: New Project
 
-## Usage
+1.  **Initialize a Project:**
 
-```bash
-# Display help message
-hpy --help
+    ```bash
+    hpy --init my-new-app
+    cd my-new-app
+    ```
+    This creates:
+    ```
+    my-new-app/
+    └── src/
+        ├── _layout.hpy   # Shared layout file
+        ├── about.hpy     # Example page
+        └── index.hpy     # Example homepage
+    ```
 
-# Compile a single file (outputs to ./dist/index.html by default)
-hpy my_app.hpy
+2.  **Run the Dev Server with Watch:**
 
-# Compile to a specific directory
-hpy my_app.hpy -o build
+    ```bash
+    # Make sure you are inside 'my-new-app' directory
+    hpy src -w
+    ```
+    *(The `src` argument tells `hpy` to process the `src` directory. `-w` enables watching and serving)*
 
-# Compile and start a development server (default port 8000)
-hpy my_app.hpy -s
+3.  **Open your browser:** Navigate to `http://localhost:8000` (or the specified port).
+4.  **Develop!** Edit files in the `src/` directory.
+5.  **Save & Refresh:** Save your changes. The tool will automatically rebuild. Refresh your browser!
 
-# Compile, serve on port 8080, and watch for changes (recommended for dev)
-hpy my_app.hpy -s -w -p 8080
-# or simply:
-hpy my_app.hpy -w -p 8080 # (-w implies -s)
+## Project Structure Explained
 
-# Use verbose mode for more detailed output
-hpy my_app.hpy -w -v
+*   **`src/` (or your specified source directory):** Contains all your source `.hpy` files.
+*   **`src/_layout.hpy` (Optional but Recommended):**
+    *   Defines the main HTML structure (`<head>`, `<body>`, shared elements).
+    *   Must contain `<!-- HPY_PAGE_CONTENT -->` where page content is injected.
+    *   Can contain global `<style>` and `<python>` blocks.
+*   **`src/*.hpy` (Page Files):**
+    *   Contain specific page content (`<html>` section replaces the layout placeholder).
+    *   Can contain page-specific `<style>` and `<python>` blocks.
+
+## `.hpy` File Structure Guide
+
+*   **`<html>...</html>`:** Contains the HTML fragment. (Required).
+*   **`<style>...</style>`:** Contains CSS rules. Multiple tags are concatenated. (Optional).
+*   **`<python>...</python>`:** Contains Brython (Python 3) code. Multiple tags are concatenated. (Optional).
+
+**Important Notes:**
+*   Ensure Python code inside `<python>` starts with no leading indentation.
+*   The layout file must contain `<!-- HPY_PAGE_CONTENT -->`.
+*   CSS and Python from layout/pages are combined globally – beware of name conflicts!
+
+### Simplified DOM Access
+
+These helpers are automatically available in your `<python>` blocks:
+
+*   `byid(id)`: Returns element or `None`.
+*   `qs(selector)`: Returns first matching element or `None`.
+*   `qsa(selector)`: Returns a list of matching elements.
+
+## Command-Line Usage
+
 ```
+usage: hpy [-h] [--init PROJECT_DIR] [-o DIR] [-v] [-s] [-p PORT] [-w] [--version] [SOURCE]
 
-## `.hpy` File Structure
+HPY Tool: Compile/serve .hpy projects (with layout support). Initialize new projects.
 
-An `.hpy` file combines HTML, CSS, and Python using dedicated tags:
+positional arguments:
+  SOURCE                Path to source .hpy file or directory.
+                        (default: src)
 
+options:
+  -h, --help            show this help message and exit
+  --init PROJECT_DIR    Initialize a new HPY project structure. Ignores SOURCE.
+  -o DIR, --output-dir DIR
+                        Directory for compiled output.
+                        (default: dist)
+  -v, --verbose         Enable detailed output.
+  -s, --serve           Start a dev server serving the output directory.
+  -p PORT, --port PORT  Port for the development server.
+                        (default: 8000)
+  -w, --watch           Watch source for changes and rebuild. Requires 'watchdog'.
+                        Using -w implies -s.
+  --version             show program's version number and exit
 
-<!-- my_app.hpy -->
+Examples:
+  hpy --init my_app          # Initialize project 'my_app'
+  hpy src -o build           # Compile src/ to build/ (using _layout.hpy)
+  hpy src -s -p 8080         # Compile src/ and serve from dist/ on port 8080
+  hpy src/app.hpy -w         # Watch single file (layout NOT automatically used)
+  hpy src -w                 # Watch src/ recursively, rebuild on changes
+```
+*(Note: Single file mode (`hpy page.hpy`) compiles the file directly and does **not** automatically use a `_layout.hpy` file.)*
 
-<html>
-    <!-- Your main HTML structure goes here -->
-    <h1>Hello, <span id="name">World</span>!</h1>
-    <input id="name-input" placeholder="Enter your name">
-</html>
+## How it Works
 
-<style>
-    /* Your CSS rules go here */
-    body { font-family: sans-serif; }
-    h1 { color: steelblue; }
-    input { margin-top: 10px; padding: 5px; }
-</style>
+When processing a directory, `hpy-tool` parses the layout (if present) and then each page file. It combines the CSS and Python, injects the page HTML into the layout placeholder, and generates the final output file. The watcher monitors the source directory and triggers rebuilds based on file changes.
 
-<python>
-# Your Brython-powered Python code goes here
-# Make sure code starts at indentation level 0 within this block!
-from browser import document, bind
+## Contributing & Development Notes
 
-def update_name(event):
-    name = document['name-input'].value
-    document['name'].text = name if name else "World"
+This project uses standard Python tooling (`setuptools`, `venv`).
 
-# Bind event listener
-input_element = document['name-input']
-input_element.bind('input', update_name)
+*   **Commits:** Please follow conventional commit message standards if possible (e.g., `feat: Add static file copying`, `fix: Correct watcher logic`).
+*   **Reporting Issues:** If you find a bug or have a suggestion, please open an issue on the project repository (if available). Provide clear steps to reproduce the problem.
+*   **Pull Requests:** Contributions are welcome! Please discuss larger changes in an issue first. Ensure code is formatted reasonably and includes necessary explanations.
 
-# Initial greeting update (optional)
-update_name(None)
-
-print("HPY app loaded and Python executed!")
-</python>
-
-
-**Important:** Ensure your Python code inside the `<python>` block starts with no leading indentation. `hpy-tool` uses `textwrap.dedent` to handle block-level indentation, but your Python syntax's relative indentation must be correct.
-
-## Behind the Scenes
-
-`hpy-tool` leverages [Brython](https://brython.info), a fantastic project that implements a Python 3 interpreter directly in the browser using JavaScript. Your Python code within `<python>` tags is executed by Brython's engine.
+Remember the project status disclaimer - your contributions can help improve it significantly!
 
 ## License
 
-This project is licensed under the **MIT License**. See the `LICENSE` file for details (You should add a LICENSE file to your project).
+This project is licensed under the **BSD 3-Clause "New" or "Revised" License**. See the `LICENSE` file for details.
