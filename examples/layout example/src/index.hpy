@@ -1,0 +1,1 @@
+<html><h2>Homepage</h2><p>Content from index.hpy.</p></html><style>/* index style */</style><python>print("Index script")</python>

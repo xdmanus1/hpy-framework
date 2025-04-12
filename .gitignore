@@ -6,7 +6,7 @@ __pycache__/
 # Ignore virtual environment directories
 venv/
 env/
-
+.venv/
 # Ignore system files
 .DS_Store
 Thumbs.db
@@ -26,3 +26,6 @@ dist/
 
 # Ignore environment variables
 .env
+
+# yes
+.idx
