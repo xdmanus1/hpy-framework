@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hpy-tool"
 # Sync version with hpy_core/config.py
-version = "0.6.0" # Updated Version
+version = "0.7.0" # Updated Version for new features
 authors = [
   { name="xdmanus", email="xdmanus.dev@gmail.com" }, # Replace
 ]
@@ -16,14 +16,15 @@ readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: BSD 3-Clause License",
+    "License :: BSD 3-Clause License", # Corrected License Name
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Build Tools",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
 ]
 dependencies = [
-    'watchdog >= 2.1.0 ; sys_platform != "win32"', # Updated watchdog version slightly
+    'watchdog >= 2.1.0 ; sys_platform != "win32"',
     'watchdog[watchmedo] >= 2.1.0 ; sys_platform == "win32"',
+    'tomli >= 1.1.0', # Added TOML parser dependency
 ]
 
 [project.scripts]

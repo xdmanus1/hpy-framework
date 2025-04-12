@@ -1,0 +1,13 @@
+<html>
+<h2>About Us</h2>
+<p>Content from <code>src/about.hpy</code>.</p>
+<p id="about-message">Brython can update this.</p>
+</html>
+<style>#about-message { font-style: italic; color: #555; }</style>
+<python>
+from browser import timer
+about_msg = byid("about-message")
+def update_msg(): about_msg.text = "Updated by about.hpy!"
+if about_msg: timer.set_timeout(update_msg, 500)
+print("about.hpy page script executed.")
+</python>

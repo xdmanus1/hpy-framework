@@ -1,0 +1,14 @@
+<html>
+<h2>Homepage</h2>
+<p>Welcome! Content from <code>src/index.hpy</code>.</p>
+<p>This page uses the shared layout which includes the static logo.</p>
+<button id="home-btn">Click Me (Home)</button>
+<div id="home-output"></div>
+</html>
+<style>#home-output { margin-top: 10px; padding: 8px; background-color: #e0e0e0; }</style>
+<python>
+home_btn = byid("home-btn"); home_output = byid("home-output"); home_count = 0
+def home_button_click(event): global home_count; home_count += 1; home_output.text = f"Home button clicked {home_count} times."
+if home_btn: home_btn.bind("click", home_button_click)
+print("index.hpy page script executed.")
+</python>

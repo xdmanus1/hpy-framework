@@ -1,0 +1,15 @@
+# HPY Tool Project Configuration (hpy.toml)
+# For documentation, see [URL to docs when available]
+
+[tool.hpy]
+
+# Source directory containing your .hpy files and static assets.
+input_dir = "src"
+
+# Directory where compiled HTML and static assets will be placed.
+output_dir = "dist"
+
+# Name of the directory within 'input_dir' for static assets (e.g., "static", "public", "assets").
+# Files in this directory will be copied directly to 'output_dir'.
+# The name here is also used as the base path in the output dir (e.g., output_dir/static_dir_name/).
+static_dir_name = "static" # Uncomment and change if needed (must be uncommented to enable feature)
