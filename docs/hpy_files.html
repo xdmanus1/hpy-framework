@@ -79,12 +79,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Use Brython - maybe for interactive examples later? -->
     <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython_stdlib.js"></script>
-    <!-- Link to docs-specific CSS -->
-    <link rel="stylesheet" href="/static/docs.css">
-    <!-- Title will be set per page ideally, but fallback -->
+    <!-- Change CSS link to be relative -->
+    <link rel="stylesheet" href="static/docs.css">
     <title>HPY Tool Documentation</title>
     <style>
         /* Minimal layout-specific styles if needed */
@@ -112,19 +110,19 @@
         pre code { background-color: transparent; padding: 0; border-radius: 0; }
     </style>
 </head>
-<body onload="brython({{'debug': 0}})"> <!-- Disable debug for docs usually -->
+<body onload="brython({{'debug': 0}})">
     <div class="docs-container">
         <aside class="sidebar">
             <h2>HPY Tool Docs</h2>
             <nav>
                 <ul>
-                    <li><a href="/index.html" id="nav-index">Introduction</a></li>
-                    <li><a href="/getting-started.html" id="nav-getting-started">Getting Started</a></li>
-                    <li><a href="/configuration.html" id="nav-configuration">Configuration (hpy.toml)</a></li>
-                    <li><a href="/static-assets.html" id="nav-static-assets">Static Assets</a></li>
-                    <li><a href="/hpy-files.html" id="nav-hpy-files">.hpy File Structure</a></li>
-                    <li><a href="/cli-usage.html" id="nav-cli-usage">CLI Usage</a></li>
-                    <!-- Add more links as pages are created -->
+                    <!-- Change nav links to be relative -->
+                    <li><a href="index.html" id="nav-index">Introduction</a></li>
+                    <li><a href="getting_started.html" id="nav-getting-started">Getting Started</a></li>
+                    <li><a href="configuration.html" id="nav-configuration">Configuration (hpy.toml)</a></li>
+                    <li><a href="static_assets.html" id="nav-static-assets">Static Assets</a></li>
+                    <li><a href="hpy_files.html" id="nav-hpy-files">.hpy File Structure</a></li>
+                    <li><a href="cli_usage.html" id="nav-cli-usage">CLI Usage</a></li>
                 </ul>
             </nav>
         </aside>
@@ -147,30 +145,32 @@
     </footer>
 
     <script type="text/python">
-    # Simple Python to highlight the active nav link
+    # Adjusted Python to highlight the active nav link using relative paths
     from browser import window, document
 
-    current_path = window.location.pathname
+    # Get the filename part of the current URL path
+    current_page = window.location.pathname.split('/')[-1]
+    if not current_page or current_page == 'hpy-framework': # Handle root index.html case for gh-pages
+        current_page = 'index.html'
+
     nav_links = document.select('.sidebar nav a')
 
     for link in nav_links:
         link_href = link.attrs.get('href', '')
-        # Basic matching, handles trailing / or .html
-        if current_path == link_href or \
-           current_path == link_href.replace('.html', '') or \
-           current_path == link_href + 'index.html' or \
-           current_path.replace('.html', '') == link_href:
+        link_page = link_href.split('/')[-1] # Get filename from link href
+
+        if current_page == link_page:
             link.classList.add('active')
             # Update page title based on active link text
             document.title = f"{link.text} | HPY Tool Docs"
             break
     else:
-         # Fallback for index if no other match
-         if current_path == '/' or current_path.endswith('/index.html'):
-              index_link = document.select_one('#nav-index')
-              if index_link:
-                   index_link.classList.add('active')
-                   document.title = f"{index_link.text} | HPY Tool Docs"
+        # If no exact match, check if we are on the implicit index page '/'
+        if current_page == 'index.html':
+             index_link = document.select_one('#nav-index')
+             if index_link:
+                  index_link.classList.add('active')
+                  document.title = f"{index_link.text} | HPY Tool Docs"
 
     print("Docs layout script loaded.")
     </script>
