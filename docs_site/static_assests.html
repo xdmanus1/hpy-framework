@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HPY Application (hpy_files)</title>
+    <title>HPY Application (static_assests)</title>
     <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython_stdlib.js"></script>
     <style>
-/* --- Start Combined CSS (hpy_files.html) --- */
+/* --- Start Combined CSS (static_assests.html) --- */
 /* Layout: _layout.hpy */
 /* Minimal layout-specific styles if needed */
         .sidebar nav ul { list-style: none; padding-left: 0; }
@@ -33,44 +33,8 @@
         }
         pre code { background-color: transparent; padding: 0; border-radius: 0; }
 
-/* Page: hpy_files.hpy */
-...
-
-</code> blocks within a single <code>.hpy</code> file; their contents will be concatenated together.</li>
-            <li>When using a layout, the CSS from the layout file is combined with the CSS from the page file (layout CSS typically comes first).</li>
-        </ul>
-    </li>
-    <li><strong><code><python>...</python></code> (Optional)</strong>
-        <ul>
-            <li>Contains Python code intended to be executed by Brython in the browser.</li>
-            <li>You can have multiple <code><python></code> blocks; their contents will be concatenated.</li>
-            <li>When using a layout, the Python code from the layout is combined with the code from the page file (layout code typically comes first).</li>
-            <li><strong>Important Indentation:</strong> The Python code directly inside the <code><python></code> tags must start with **zero** leading spaces or tabs. Indentation within functions, classes, etc., follows standard Python rules.</li>
-        </ul>
-    </li>
-</ul>
-
-<p>Example <code>.hpy</code> page file:</p>
-<pre><code><html>
-    <div class="greeting-card">
-        <h2>Welcome!</h2>
-        <p id="message">This message will be updated by Python.</p>
-        <button id="update-btn">Update Message</button>
-    </div>
-</html>
-
-<style>
-    .greeting-card {
-        border: 1px solid #ccc;
-        padding: 15px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
-    #message {
-        color: blue;
-    }
-
-/* .hpy Files page specific styles */
+/* Page: static_assests.hpy */
+/* Static Assets page specific styles */
 /* --- End Combined CSS --- */
     </style>
 </head>
@@ -119,26 +83,73 @@
             <nav>
                 <ul>
                     <li><a href="/index.html" id="nav-index">Introduction</a></li>
-                    <li><a href="/getting_started.html" id="nav-getting-started">Getting Started</a></li>
+                    <li><a href="/getting-started.html" id="nav-getting-started">Getting Started</a></li>
                     <li><a href="/configuration.html" id="nav-configuration">Configuration (hpy.toml)</a></li>
-                    <li><a href="/static_assets.html" id="nav-static-assets">Static Assets</a></li>
-                    <li><a href="/hpy_files.html" id="nav-hpy-files">.hpy File Structure</a></li>
-                    <li><a href="/cli_usage.html" id="nav-cli-usage">CLI Usage</a></li>
+                    <li><a href="/static-assets.html" id="nav-static-assets">Static Assets</a></li>
+                    <li><a href="/hpy-files.html" id="nav-hpy-files">.hpy File Structure</a></li>
+                    <li><a href="/cli-usage.html" id="nav-cli-usage">CLI Usage</a></li>
                     <!-- Add more links as pages are created -->
                 </ul>
             </nav>
         </aside>
         <main class="content">
             <!-- Page content injected here -->
-            <h1>.hpy File Structure</h1>
+            <h1>Static Assets</h1>
 
-<p>The core concept of <code>hpy-tool</code> revolves around <code>.hpy</code> files. These files allow you to encapsulate HTML structure, CSS styling, and client-side Python (Brython) logic within a single file, promoting component-like organization.</p>
+<p><code>hpy-tool</code> provides built-in support for handling static assets like CSS files, JavaScript files, images, fonts, and other resources that need to be served alongside your compiled HTML pages.</p>
 
-<h2>Basic Structure</h2>
-<p>A typical <code>.hpy</code> file consists of up to three distinct sections, identified by specific HTML-like tags:</p>
+<h2>Enabling Static Asset Handling</h2>
+<p>To enable this feature, you must:</p>
+<ol>
+    <li>Define the <code>static_dir_name</code> setting within the <code>[tool.hpy]</code> table in your <code>hpy.toml</code> file.</li>
+    <li>Ensure the directory named by <code>static_dir_name</code> exists within your configured <code>input_dir</code>.</li>
+</ol>
 
+<p>Example <code>hpy.toml</code> enabling static assets in <code>src/static/</code>:</p>
+<pre><code>[tool.hpy]
+input_dir = "src"
+output_dir = "dist"
+# This line enables the feature for the directory named "static"
+static_dir_name = "static"</code></pre>
+
+<p>If <code>static_dir_name</code> is commented out or not present in <code>hpy.toml</code>, static asset handling is disabled.</p>
+
+<h2>How it Works</h2>
+
+<p>When static asset handling is enabled:</p>
 <ul>
-    <li><strong><code><html>...
+    <li><strong>During Build (`hpy` or `hpy src`):</strong> The entire contents of the source static directory (<code><input_dir>/<static_dir_name>/</code>) are recursively copied into the output directory, preserving the directory structure, under the same name (<code><output_dir>/<static_dir_name>/</code>). For example, <code>src/static/css/style.css</code> becomes <code>dist/static/css/style.css</code>. The copy operation uses <code>shutil.copytree</code> with <code>dirs_exist_ok=True</code>, so it handles updates correctly on subsequent builds.</li>
+    <li><strong>During Watch Mode (`hpy -w`):</strong> The watcher monitors the source static directory for changes:
+        <ul>
+            <li><strong>Create/Modify:</strong> When a file or directory is created or modified within the source static directory, it is copied (or updated) to the corresponding location in the output static directory.</li>
+            <li><strong>Delete:</strong> When a file or directory is deleted from the source static directory, the corresponding file or directory is removed from the output static directory.</li>
+            <li><strong>Rename/Move:</strong> Renaming or moving files/directories within the static directory is handled by deleting the old target path and copying to the new target path.</li>
+        </ul>
+    </li>
+    <li><strong><code>.hpy</code> File Exclusion:</strong> Any <code>.hpy</code> files placed inside the designated static directory are ignored by the page compilation process. They are treated simply as static files and will be copied as-is.</li>
+</ul>
+
+<h2>Referencing Static Assets</h2>
+<p>When referencing static assets in your HTML (e.g., in `_layout.hpy` or page files) or CSS, use paths relative to the root of the output directory.</p>
+<p>Since the static assets are copied into <code><output_dir>/<static_dir_name>/</code>, you typically reference them starting with <code>/<static_dir_name>/</code>.</p>
+
+<p>Examples (assuming <code>static_dir_name = "static"</code>):</p>
+<ul>
+    <li>Linking a CSS file (<code>src/static/css/theme.css</code>):
+        <pre><code><link rel="stylesheet" href="/static/css/theme.css"></code></pre>
+    </li>
+    <li>Displaying an image (<code>src/static/images/logo.png</code>):
+        <pre><code><img src="/static/images/logo.png" alt="My Logo"></code></pre>
+    </li>
+    <li>Referencing a font in CSS (<code>src/static/fonts/font.woff2</code>):
+        <pre><code class="language-css">@font-face {
+  font-family: 'MyFont';
+  src: url('/static/fonts/font.woff2') format('woff2');
+}</code></pre>
+    </li>
+</ul>
+
+<p>The development server correctly serves these files from the output directory.</p>
         </main>
     </div>
 
@@ -177,7 +188,7 @@
 </body>
 
 <script type="text/python">
-# --- Start Combined Python (hpy_files.html) ---
+# --- Start Combined Python (static_assests.html) ---
 
 # --- HPY Tool Helper Functions (Injected) ---
 from browser import document
@@ -197,54 +208,8 @@ def qsa(selector):
 # Layout: _layout.hpy
 
 
-# Page: hpy_files.hpy
-...
-
-</code> blocks; their contents will be concatenated.</li>
-            <li>When using a layout, the Python code from the layout is combined with the code from the page file (layout code typically comes first).</li>
-            <li><strong>Important Indentation:</strong> The Python code directly inside the <code><python></code> tags must start with **zero** leading spaces or tabs. Indentation within functions, classes, etc., follows standard Python rules.</li>
-        </ul>
-    </li>
-</ul>
-
-<p>Example <code>.hpy</code> page file:</p>
-<pre><code><html>
-    <div class="greeting-card">
-        <h2>Welcome!</h2>
-        <p id="message">This message will be updated by Python.</p>
-        <button id="update-btn">Update Message</button>
-    </div>
-</html>
-
-<style>
-    .greeting-card {
-        border: 1px solid #ccc;
-        padding: 15px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
-    #message {
-        color: blue;
-    }
-</style>
-
-<python>
-# Python code starts with no indentation here
-from browser import document, alert
-
-message_element = byid("message")  # Use injected helper
-button_element = byid("update-btn") # Use injected helper
-
-def show_new_message(event):
-    # Standard indentation inside function
-    message_element.text = "Message updated by Brython!"
-    alert("Message updated!")
-
-button_element.bind("click", show_new_message)
-
-print("Page script executed.")
-
-print(".hpy Files page script loaded.")
+# Page: static_assests.hpy
+print("Static Assets page script loaded.")
 # --- End Combined Python ---
 </script>
 

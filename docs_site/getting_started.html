@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HPY Application (configuration)</title>
+    <title>HPY Application (getting_started)</title>
     <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython_stdlib.js"></script>
     <style>
-/* --- Start Combined CSS (configuration.html) --- */
+/* --- Start Combined CSS (getting_started.html) --- */
 /* Layout: _layout.hpy */
 /* Minimal layout-specific styles if needed */
         .sidebar nav ul { list-style: none; padding-left: 0; }
@@ -33,8 +33,8 @@
         }
         pre code { background-color: transparent; padding: 0; border-radius: 0; }
 
-/* Page: configuration.hpy */
-/* Configuration page specific styles */
+/* Page: getting_started.hpy */
+/* Getting Started page specific styles if needed */
 /* --- End Combined CSS --- */
     </style>
 </head>
@@ -83,74 +83,109 @@
             <nav>
                 <ul>
                     <li><a href="/index.html" id="nav-index">Introduction</a></li>
-                    <li><a href="/getting_started.html" id="nav-getting-started">Getting Started</a></li>
+                    <li><a href="/getting-started.html" id="nav-getting-started">Getting Started</a></li>
                     <li><a href="/configuration.html" id="nav-configuration">Configuration (hpy.toml)</a></li>
-                    <li><a href="/static_assets.html" id="nav-static-assets">Static Assets</a></li>
-                    <li><a href="/hpy_files.html" id="nav-hpy-files">.hpy File Structure</a></li>
-                    <li><a href="/cli_usage.html" id="nav-cli-usage">CLI Usage</a></li>
+                    <li><a href="/static-assets.html" id="nav-static-assets">Static Assets</a></li>
+                    <li><a href="/hpy-files.html" id="nav-hpy-files">.hpy File Structure</a></li>
+                    <li><a href="/cli-usage.html" id="nav-cli-usage">CLI Usage</a></li>
                     <!-- Add more links as pages are created -->
                 </ul>
             </nav>
         </aside>
         <main class="content">
             <!-- Page content injected here -->
-            <h1>Configuration (hpy.toml)</h1>
+            <h1>Getting Started</h1>
 
-<p><code>hpy-tool</code> uses a configuration file named <code>hpy.toml</code> located in the root of your project directory to manage common settings. This allows you to define project structure without relying solely on command-line arguments.</p>
+<p>Setting up and using <code>hpy-tool</code> is straightforward. Follow these steps to install the tool and initialize your first project.</p>
 
-<h2>Finding the Configuration</h2>
-<p>When you run <code>hpy</code> commands like <code>hpy build</code> or <code>hpy -w</code>, the tool automatically searches for <code>hpy.toml</code> by looking in the specified input directory (or the default <code>src/</code>) and then checking its parent directories upwards until it finds the file or reaches the filesystem root.</p>
-<p>The directory containing <code>hpy.toml</code> is considered the **project root**. Paths defined within the configuration file are relative to this root, unless specified otherwise.</p>
+<h2>Installation</h2>
 
-<h2>File Format</h2>
-<p>The configuration uses the TOML format. All <code>hpy-tool</code> specific settings must reside within the <code>[tool.hpy]</code> table.</p>
+<p>A Python virtual environment is strongly recommended to manage dependencies for your project.</p>
 
-<pre><code># hpy.toml Example
+<pre><code># 1. Create and activate a virtual environment (if you haven't)
+python -m venv .venv
 
-# This table contains all settings for hpy-tool
-[tool.hpy]
+# Linux/macOS:
+source .venv/bin/activate
 
-# Path to the directory containing your source .hpy files and static directory.
-# Relative to the project root (where hpy.toml lives).
-input_dir = "src"
+# Windows (CMD):
+# .venv\Scripts\activate.bat
 
-# Path to the directory where compiled HTML and copied static assets will be placed.
-# Relative to the project root.
-output_dir = "dist"
+# Windows (PowerShell):
+# .venv\Scripts\Activate.ps1
 
-# The name of the directory *inside* input_dir that holds static assets.
-# Setting this enables static file handling. Contents are copied to output_dir/<static_dir_name>.
-# This line must be uncommented for static files to be processed.
-static_dir_name = "static"
+# 2. Install hpy-tool
+# Option A: From PyPI (Recommended once published)
+# pip install hpy-tool
 
-# --- Future settings might be added here ---
-</code></pre>
+# Option B: From local source code (for development)
+# Navigate to the root directory of the hpy-tool project (where pyproject.toml is)
+pip install -e .
 
-<h2>Available Settings</h2>
+# Dependencies: This installs 'watchdog' (required for -w) and 'tomli'
+# (required for hpy.toml configuration on Python < 3.11).</code></pre>
+
+<h2>Initialize Your First Project</h2>
+
+<p>The easiest way to start is by using the <code>--init</code> command.</p>
+
+<pre><code># 1. Initialize a new project directory
+hpy --init my-first-app
+
+# 2. Navigate into the project directory
+cd my-first-app</code></pre>
+
+<p>This command will prompt you to choose a template. Choosing the default (Directory with Layout) creates the following structure:</p>
+
+<pre><code>my-first-app/
+├── hpy.toml        # Project configuration file
+└── src/            # Default source directory
+    ├── _layout.hpy   # Shared layout file
+    ├── about.hpy     # Example page
+    ├── index.hpy     # Example homepage
+    └── static/       # Static asset directory
+        └── logo.svg  # Example static file</code></pre>
+
+<p>Key files generated:</p>
 <ul>
-    <li>
-        <p><strong><code>input_dir</code></strong> (string, default: <code>"src"</code>)</p>
-        <p>Specifies the directory containing your source <code>.hpy</code> files (including <code>_layout.hpy</code>) and your static asset directory (named by <code>static_dir_name</code>). Path is relative to the project root.</p>
-    </li>
-    <li>
-        <p><strong><code>output_dir</code></strong> (string, default: <code>"dist"</code>)</p>
-        <p>Specifies the directory where the compiled HTML files and copied static assets will be generated. Path is relative to the project root.</p>
-    </li>
-    <li>
-        <p><strong><code>static_dir_name</code></strong> (string, default: <code>"static"</code>)</p>
-        <p>Defines the name of the directory <em>within</em> <code>input_dir</code> that contains your static assets (e.g., CSS, images, fonts). <strong>This setting must be explicitly defined (uncommented) in <code>hpy.toml</code> to enable static asset handling.</strong> If enabled, files and directories from <code><input_dir>/<static_dir_name>/</code> will be copied to <code><output_dir>/<static_dir_name>/</code> during builds and synced during watch mode.</p>
+    <li><code>hpy.toml</code>: Configures your project's input, output, and static directories.</li>
+    <li><code>src/_layout.hpy</code>: The main HTML template for all pages.</li>
+    <li><code>src/index.hpy</code>, <code>src/about.hpy</code>: Example content pages.</li>
+    <li><code>src/static/logo.svg</code>: An example static asset referenced in the layout.</li>
+</ul>
+<p><em>Important:</em> For static asset handling to work, ensure the <code>static_dir_name</code> line in your <code>hpy.toml</code> is uncommented and correctly set.</p>
+
+<h2>Run the Development Server</h2>
+
+<p>With your project initialized and dependencies installed, start the development server:</p>
+
+<pre><code># Make sure you are inside your project directory ('my-first-app')
+hpy -w</code></pre>
+
+<p>Explanation:</p>
+<ul>
+    <li><code>hpy</code>: Executes the tool.</li>
+    <li><code>-w</code> (watch mode): This flag tells <code>hpy-tool</code> to:
+        <ul>
+            <li>Perform an initial build (compiling <code>.hpy</code> files and copying static assets) based on <code>hpy.toml</code> settings (defaulting to <code>src</code> -> <code>dist</code>).</li>
+            <li>Start a development web server (defaulting to port 8000) serving the output directory (<code>dist</code>).</li>
+            <li>Watch the source directory (<code>src</code>) for changes.</li>
+            <li>Automatically rebuild relevant <code>.hpy</code> files or sync changed static assets when you save changes.</li>
+        </ul>
     </li>
 </ul>
 
-<h2>Precedence Rules</h2>
-<p>Settings are determined based on the following order of precedence (highest priority first):</p>
+<p>Open your web browser and navigate to <a href="http://localhost:8000">http://localhost:8000</a> (or the port shown in the console). You should see your application running!</p>
+
+<h2>Development Workflow</h2>
 <ol>
-    <li><strong>Command-Line Arguments:</strong> Flags like <code>-o <dir></code> or providing a specific <code>SOURCE</code> path on the command line always override any other settings.</li>
-    <li><strong><code>hpy.toml</code> Settings:</strong> If a setting is not provided via a CLI argument, the value defined in the <code>[tool.hpy]</code> table of <code>hpy.toml</code> is used.</li>
-    <li><strong>Built-in Defaults:</strong> If a setting is not provided via CLI or <code>hpy.toml</code>, the tool falls back to its built-in defaults (e.g., <code>input_dir = "src"</code>, <code>output_dir = "dist"</code>).</li>
+    <li>Edit files within your source directory (<code>src/</code> by default). Modify <code>.hpy</code> pages, the layout, or add/change files in the static directory.</li>
+    <li>Save your changes.</li>
+    <li><code>hpy-tool</code> (running with <code>-w</code>) detects the changes and automatically rebuilds or syncs assets.</li>
+    <li>Refresh your web browser to see the updated application.</li>
 </ol>
 
-<p>This allows you to set up standard project conventions in <code>hpy.toml</code> while still having the flexibility to override them for specific commands when needed.</p>
+<p>You are now ready to start building your web application with HPY!</p>
         </main>
     </div>
 
@@ -189,7 +224,7 @@ static_dir_name = "static"
 </body>
 
 <script type="text/python">
-# --- Start Combined Python (configuration.html) ---
+# --- Start Combined Python (getting_started.html) ---
 
 # --- HPY Tool Helper Functions (Injected) ---
 from browser import document
@@ -209,8 +244,8 @@ def qsa(selector):
 # Layout: _layout.hpy
 
 
-# Page: configuration.hpy
-print("Configuration page script loaded.")
+# Page: getting_started.hpy
+print("Getting Started page script loaded.")
 # --- End Combined Python ---
 </script>
 

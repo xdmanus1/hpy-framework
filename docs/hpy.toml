@@ -6,7 +6,7 @@ input_dir = "src"
 
 # Output directory relative to this config file (docs/dist)
 # We'll build here initially, then configure deployment.
-output_dir = "dists"
+output_dir = "dist"
 
 # Static asset directory relative to input_dir (docs/src/static)
 static_dir_name = "static"
