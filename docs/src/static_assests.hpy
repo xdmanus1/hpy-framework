@@ -1,0 +1,67 @@
+<!-- docs/src/static-assets.hpy -->
+<html>
+<h1>Static Assets</h1>
+
+<p><code>hpy-tool</code> provides built-in support for handling static assets like CSS files, JavaScript files, images, fonts, and other resources that need to be served alongside your compiled HTML pages.</p>
+
+<h2>Enabling Static Asset Handling</h2>
+<p>To enable this feature, you must:</p>
+<ol>
+    <li>Define the <code>static_dir_name</code> setting within the <code>[tool.hpy]</code> table in your <code>hpy.toml</code> file.</li>
+    <li>Ensure the directory named by <code>static_dir_name</code> exists within your configured <code>input_dir</code>.</li>
+</ol>
+
+<p>Example <code>hpy.toml</code> enabling static assets in <code>src/static/</code>:</p>
+<pre><code>[tool.hpy]
+input_dir = "src"
+output_dir = "dist"
+# This line enables the feature for the directory named "static"
+static_dir_name = "static"</code></pre>
+
+<p>If <code>static_dir_name</code> is commented out or not present in <code>hpy.toml</code>, static asset handling is disabled.</p>
+
+<h2>How it Works</h2>
+
+<p>When static asset handling is enabled:</p>
+<ul>
+    <li><strong>During Build (`hpy` or `hpy src`):</strong> The entire contents of the source static directory (<code><input_dir>/<static_dir_name>/</code>) are recursively copied into the output directory, preserving the directory structure, under the same name (<code><output_dir>/<static_dir_name>/</code>). For example, <code>src/static/css/style.css</code> becomes <code>dist/static/css/style.css</code>. The copy operation uses <code>shutil.copytree</code> with <code>dirs_exist_ok=True</code>, so it handles updates correctly on subsequent builds.</li>
+    <li><strong>During Watch Mode (`hpy -w`):</strong> The watcher monitors the source static directory for changes:
+        <ul>
+            <li><strong>Create/Modify:</strong> When a file or directory is created or modified within the source static directory, it is copied (or updated) to the corresponding location in the output static directory.</li>
+            <li><strong>Delete:</strong> When a file or directory is deleted from the source static directory, the corresponding file or directory is removed from the output static directory.</li>
+            <li><strong>Rename/Move:</strong> Renaming or moving files/directories within the static directory is handled by deleting the old target path and copying to the new target path.</li>
+        </ul>
+    </li>
+    <li><strong><code>.hpy</code> File Exclusion:</strong> Any <code>.hpy</code> files placed inside the designated static directory are ignored by the page compilation process. They are treated simply as static files and will be copied as-is.</li>
+</ul>
+
+<h2>Referencing Static Assets</h2>
+<p>When referencing static assets in your HTML (e.g., in `_layout.hpy` or page files) or CSS, use paths relative to the root of the output directory.</p>
+<p>Since the static assets are copied into <code><output_dir>/<static_dir_name>/</code>, you typically reference them starting with <code>/<static_dir_name>/</code>.</p>
+
+<p>Examples (assuming <code>static_dir_name = "static"</code>):</p>
+<ul>
+    <li>Linking a CSS file (<code>src/static/css/theme.css</code>):
+        <pre><code><link rel="stylesheet" href="/static/css/theme.css"></code></pre>
+    </li>
+    <li>Displaying an image (<code>src/static/images/logo.png</code>):
+        <pre><code><img src="/static/images/logo.png" alt="My Logo"></code></pre>
+    </li>
+    <li>Referencing a font in CSS (<code>src/static/fonts/font.woff2</code>):
+        <pre><code class="language-css">@font-face {
+  font-family: 'MyFont';
+  src: url('/static/fonts/font.woff2') format('woff2');
+}</code></pre>
+    </li>
+</ul>
+
+<p>The development server correctly serves these files from the output directory.</p>
+</html>
+
+<style>
+/* Static Assets page specific styles */
+</style>
+
+<python>
+print("Static Assets page script loaded.")
+</python>

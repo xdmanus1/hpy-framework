@@ -1,0 +1,128 @@
+<html>
+<h1>Command-Line Usage</h1>
+
+<p>The <code>hpy</code> command is the main interface for interacting with <code>hpy-tool</code>. Here's a breakdown of the available commands and options.</p>
+
+<pre><code>$ hpy --help
+
+usage: hpy [-h] [--init PROJECT_DIR] [-o DIR] [-v] [-s] [-p PORT] [-w] [--version] [SOURCE]
+
+HPY Tool: Compile/serve .hpy projects. Configurable via hpy.toml.
+
+positional arguments:
+  SOURCE                Path to source .hpy file or directory.
+                        (default: 'src' from hpy.toml or built-in)
+
+options:
+  -h, --help            show this help message and exit
+  --init PROJECT_DIR    Initialize a new HPY project structure (creates hpy.toml). Ignores SOURCE.
+  -o DIR, --output-dir DIR
+                        Directory for compiled output.
+                        (overrides hpy.toml, default: 'dist' from hpy.toml or built-in)
+  -v, --verbose         Enable detailed output.
+  -s, --serve           Start a dev server serving the output directory.
+  -p PORT, --port PORT  Port for the development server.
+                        (default: 8000)
+  -w, --watch           Watch source for changes and rebuild/sync. Requires 'watchdog'.
+                        Using -w implies -s and uses the effective input/output dirs.
+  --version             show program's version number and exit</code></pre>
+
+<h2>Positional Arguments</h2>
+<ul>
+    <li><strong><code>SOURCE</code></strong> (Optional)
+        <ul>
+            <li>Specifies the path to the source <code>.hpy</code> file or directory to process.</li>
+            <li>If omitted, the tool looks for the <code>input_dir</code> setting in <code>hpy.toml</code>.</li>
+            <li>If also not found in <code>hpy.toml</code>, it defaults to <code>"src"</code>.</li>
+            <li>If a file is provided (e.g., <code>hpy page.hpy</code>), only that file is compiled, and layout/static handling are **not** automatically applied.</li>
+            <li>If a directory is provided (e.g., <code>hpy app_source</code>), the entire directory is processed according to layout and static asset rules.</li>
+        </ul>
+    </li>
+</ul>
+
+<h2>Options</h2>
+<ul>
+    <li><strong><code>-h, --help</code></strong>
+        <ul><li>Shows the help message and exits.</li></ul>
+    </li>
+    <li><strong><code>--init PROJECT_DIR</code></strong>
+        <ul>
+            <li>Initializes a new project skeleton in the specified <code>PROJECT_DIR</code>.</li>
+            <li>Prompts for a template choice (Single File or Directory/Layout).</li>
+            <li>Creates necessary files, including <code>hpy.toml</code>.</li>
+            <li>Ignores the optional <code>SOURCE</code> argument if provided.</li>
+        </ul>
+    </li>
+    <li><strong><code>-o DIR, --output-dir DIR</code></strong>
+        <ul>
+            <li>Specifies the directory where compiled HTML and static assets should be placed.</li>
+            <li>This **overrides** the <code>output_dir</code> setting in <code>hpy.toml</code>.</li>
+            <li>If omitted, the value from <code>hpy.toml</code> is used (defaulting to <code>"dist"</code> if not set there either).</li>
+        </ul>
+    </li>
+    <li><strong><code>-v, --verbose</code></strong>
+        <ul><li>Enables detailed logging during build, watch, and server operations. Useful for debugging.</li></ul>
+    </li>
+    <li><strong><code>-s, --serve</code></strong>
+        <ul>
+            <li>Starts a simple development HTTP server after the build finishes (if applicable).</li>
+            <li>Serves files from the determined output directory.</li>
+            <li>Automatically adds no-cache headers.</li>
+            <li>Note: Using <code>-w</code> implicitly enables <code>-s</code>.</li>
+        </ul>
+    </li>
+    <li><strong><code>-p PORT, --port PORT</code></strong> (Default: <code>8000</code>)
+        <ul><li>Specifies the port number for the development server (used with <code>-s</code> or <code>-w</code>).</li></ul>
+    </li>
+    <li><strong><code>-w, --watch</code></strong>
+        <ul>
+            <li>Enables watch mode (requires the <code>watchdog</code> library).</li>
+            <li>Performs an initial build.</li>
+            <li>Starts the development server (implicitly enables <code>-s</code>).</li>
+            <li>Monitors the source directory (including static subdirectory if enabled) for changes.</li>
+            <li>Automatically rebuilds <code>.hpy</code> files or syncs static assets upon changes.</li>
+            <li>Uses the effective input and output directories determined by CLI args, <code>hpy.toml</code>, or defaults.</li>
+        </ul>
+    </li>
+     <li><strong><code>--version</code></strong>
+        <ul><li>Shows the installed <code>hpy-tool</code> version and exits.</li></ul>
+    </li>
+</ul>
+
+<h2>Common Usage Examples</h2>
+<pre><code># Initialize a new project in 'my_app' directory
+hpy --init my_app
+
+# Build the project using settings from hpy.toml (e.g., src -> dist)
+hpy
+
+# Build the project, overriding the output directory
+hpy -o build
+
+# Build using a specific source directory, overriding output
+hpy app_source -o public
+
+# Build only a single file (no layout/static handling) into 'dist'
+hpy src/pages/contact.hpy
+
+# Build project and serve from the output directory on default port 8000
+hpy -s
+
+# Build project, watch for changes, and serve on port 8080
+# (Uses input/output from hpy.toml or defaults)
+hpy -w -p 8080
+
+# Watch only a single file (no layout/static handling) and serve its output
+# (Output placed in 'dist/single.html' by default, server serves 'dist')
+hpy src/single.hpy -w
+</code></pre>
+
+</html>
+
+<style>
+/* CLI Usage page specific styles */
+</style>
+
+<python>
+print("CLI Usage page script loaded.")
+</python>

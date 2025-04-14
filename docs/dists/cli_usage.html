@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPY Application (cli_usage)</title>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython_stdlib.js"></script>
+    <style>
+/* --- Start Combined CSS (cli_usage.html) --- */
+/* Layout: _layout.hpy */
+/* Minimal layout-specific styles if needed */
+        .sidebar nav ul { list-style: none; padding-left: 0; }
+        .sidebar nav ul li { margin: 0.5em 0; }
+        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
+
+        /* Basic code block styling */
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1em;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        code {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+
+/* Page: cli_usage.hpy */
+/* CLI Usage page specific styles */
+/* --- End Combined CSS --- */
+    </style>
+</head>
+<body onload="brython({'debug': 1})">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use Brython - maybe for interactive examples later? -->
+    <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython_stdlib.js"></script>
+    <!-- Link to docs-specific CSS -->
+    <link rel="stylesheet" href="/static/docs.css">
+    <!-- Title will be set per page ideally, but fallback -->
+    <title>HPY Tool Documentation</title>
+    <style>
+        /* Minimal layout-specific styles if needed */
+        .sidebar nav ul { list-style: none; padding-left: 0; }
+        .sidebar nav ul li { margin: 0.5em 0; }
+        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
+
+        /* Basic code block styling */
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1em;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        code {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+    </style>
+</head>
+<body onload="brython({{'debug': 0}})"> <!-- Disable debug for docs usually -->
+    <div class="docs-container">
+        <aside class="sidebar">
+            <h2>HPY Tool Docs</h2>
+            <nav>
+                <ul>
+                    <li><a href="/index.html" id="nav-index">Introduction</a></li>
+                    <li><a href="/getting_started.html" id="nav-getting-started">Getting Started</a></li>
+                    <li><a href="/configuration.html" id="nav-configuration">Configuration (hpy.toml)</a></li>
+                    <li><a href="/static_assets.html" id="nav-static-assets">Static Assets</a></li>
+                    <li><a href="/hpy_files.html" id="nav-hpy-files">.hpy File Structure</a></li>
+                    <li><a href="/cli_usage.html" id="nav-cli-usage">CLI Usage</a></li>
+                    <!-- Add more links as pages are created -->
+                </ul>
+            </nav>
+        </aside>
+        <main class="content">
+            <!-- Page content injected here -->
+            <h1>Command-Line Usage</h1>
+
+<p>The <code>hpy</code> command is the main interface for interacting with <code>hpy-tool</code>. Here's a breakdown of the available commands and options.</p>
+
+<pre><code>$ hpy --help
+
+usage: hpy [-h] [--init PROJECT_DIR] [-o DIR] [-v] [-s] [-p PORT] [-w] [--version] [SOURCE]
+
+HPY Tool: Compile/serve .hpy projects. Configurable via hpy.toml.
+
+positional arguments:
+  SOURCE                Path to source .hpy file or directory.
+                        (default: 'src' from hpy.toml or built-in)
+
+options:
+  -h, --help            show this help message and exit
+  --init PROJECT_DIR    Initialize a new HPY project structure (creates hpy.toml). Ignores SOURCE.
+  -o DIR, --output-dir DIR
+                        Directory for compiled output.
+                        (overrides hpy.toml, default: 'dist' from hpy.toml or built-in)
+  -v, --verbose         Enable detailed output.
+  -s, --serve           Start a dev server serving the output directory.
+  -p PORT, --port PORT  Port for the development server.
+                        (default: 8000)
+  -w, --watch           Watch source for changes and rebuild/sync. Requires 'watchdog'.
+                        Using -w implies -s and uses the effective input/output dirs.
+  --version             show program's version number and exit</code></pre>
+
+<h2>Positional Arguments</h2>
+<ul>
+    <li><strong><code>SOURCE</code></strong> (Optional)
+        <ul>
+            <li>Specifies the path to the source <code>.hpy</code> file or directory to process.</li>
+            <li>If omitted, the tool looks for the <code>input_dir</code> setting in <code>hpy.toml</code>.</li>
+            <li>If also not found in <code>hpy.toml</code>, it defaults to <code>"src"</code>.</li>
+            <li>If a file is provided (e.g., <code>hpy page.hpy</code>), only that file is compiled, and layout/static handling are **not** automatically applied.</li>
+            <li>If a directory is provided (e.g., <code>hpy app_source</code>), the entire directory is processed according to layout and static asset rules.</li>
+        </ul>
+    </li>
+</ul>
+
+<h2>Options</h2>
+<ul>
+    <li><strong><code>-h, --help</code></strong>
+        <ul><li>Shows the help message and exits.</li></ul>
+    </li>
+    <li><strong><code>--init PROJECT_DIR</code></strong>
+        <ul>
+            <li>Initializes a new project skeleton in the specified <code>PROJECT_DIR</code>.</li>
+            <li>Prompts for a template choice (Single File or Directory/Layout).</li>
+            <li>Creates necessary files, including <code>hpy.toml</code>.</li>
+            <li>Ignores the optional <code>SOURCE</code> argument if provided.</li>
+        </ul>
+    </li>
+    <li><strong><code>-o DIR, --output-dir DIR</code></strong>
+        <ul>
+            <li>Specifies the directory where compiled HTML and static assets should be placed.</li>
+            <li>This **overrides** the <code>output_dir</code> setting in <code>hpy.toml</code>.</li>
+            <li>If omitted, the value from <code>hpy.toml</code> is used (defaulting to <code>"dist"</code> if not set there either).</li>
+        </ul>
+    </li>
+    <li><strong><code>-v, --verbose</code></strong>
+        <ul><li>Enables detailed logging during build, watch, and server operations. Useful for debugging.</li></ul>
+    </li>
+    <li><strong><code>-s, --serve</code></strong>
+        <ul>
+            <li>Starts a simple development HTTP server after the build finishes (if applicable).</li>
+            <li>Serves files from the determined output directory.</li>
+            <li>Automatically adds no-cache headers.</li>
+            <li>Note: Using <code>-w</code> implicitly enables <code>-s</code>.</li>
+        </ul>
+    </li>
+    <li><strong><code>-p PORT, --port PORT</code></strong> (Default: <code>8000</code>)
+        <ul><li>Specifies the port number for the development server (used with <code>-s</code> or <code>-w</code>).</li></ul>
+    </li>
+    <li><strong><code>-w, --watch</code></strong>
+        <ul>
+            <li>Enables watch mode (requires the <code>watchdog</code> library).</li>
+            <li>Performs an initial build.</li>
+            <li>Starts the development server (implicitly enables <code>-s</code>).</li>
+            <li>Monitors the source directory (including static subdirectory if enabled) for changes.</li>
+            <li>Automatically rebuilds <code>.hpy</code> files or syncs static assets upon changes.</li>
+            <li>Uses the effective input and output directories determined by CLI args, <code>hpy.toml</code>, or defaults.</li>
+        </ul>
+    </li>
+     <li><strong><code>--version</code></strong>
+        <ul><li>Shows the installed <code>hpy-tool</code> version and exits.</li></ul>
+    </li>
+</ul>
+
+<h2>Common Usage Examples</h2>
+<pre><code># Initialize a new project in 'my_app' directory
+hpy --init my_app
+
+# Build the project using settings from hpy.toml (e.g., src -> dist)
+hpy
+
+# Build the project, overriding the output directory
+hpy -o build
+
+# Build using a specific source directory, overriding output
+hpy app_source -o public
+
+# Build only a single file (no layout/static handling) into 'dist'
+hpy src/pages/contact.hpy
+
+# Build project and serve from the output directory on default port 8000
+hpy -s
+
+# Build project, watch for changes, and serve on port 8080
+# (Uses input/output from hpy.toml or defaults)
+hpy -w -p 8080
+
+# Watch only a single file (no layout/static handling) and serve its output
+# (Output placed in 'dist/single.html' by default, server serves 'dist')
+hpy src/single.hpy -w
+</code></pre>
+        </main>
+    </div>
+
+    <footer>
+        <p>HPY Tool Documentation | BSD 3-Clause Licensed</p>
+    </footer>
+
+    <script type="text/python">
+    # Simple Python to highlight the active nav link
+    from browser import window, document
+
+    current_path = window.location.pathname
+    nav_links = document.select('.sidebar nav a')
+
+    for link in nav_links:
+        link_href = link.attrs.get('href', '')
+        # Basic matching, handles trailing / or .html
+        if current_path == link_href or \
+           current_path == link_href.replace('.html', '') or \
+           current_path == link_href + 'index.html' or \
+           current_path.replace('.html', '') == link_href:
+            link.classList.add('active')
+            # Update page title based on active link text
+            document.title = f"{link.text} | HPY Tool Docs"
+            break
+    else:
+         # Fallback for index if no other match
+         if current_path == '/' or current_path.endswith('/index.html'):
+              index_link = document.select_one('#nav-index')
+              if index_link:
+                   index_link.classList.add('active')
+                   document.title = f"{index_link.text} | HPY Tool Docs"
+
+    print("Docs layout script loaded.")
+    </script>
+</body>
+
+<script type="text/python">
+# --- Start Combined Python (cli_usage.html) ---
+
+# --- HPY Tool Helper Functions (Injected) ---
+from browser import document
+import sys as _hpy_sys # Alias to avoid user conflicts
+def byid(element_id):
+    # Shortcut for document[element_id]. Returns None if ID not found.
+    try: return document[element_id]
+    except KeyError: return None
+def qs(selector):
+    # Shortcut for document.select_one(selector). Returns None if not found.
+    return document.select_one(selector)
+def qsa(selector):
+    # Shortcut for document.select(selector). Returns a list (possibly empty).
+    return document.select(selector)
+# --- End Helper Functions ---
+
+# Layout: _layout.hpy
+
+
+# Page: cli_usage.hpy
+print("CLI Usage page script loaded.")
+# --- End Combined Python ---
+</script>
+
+</body>
+</html>

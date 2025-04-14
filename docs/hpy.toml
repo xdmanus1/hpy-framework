@@ -1,0 +1,12 @@
+# docs/hpy.toml - Configuration for building the documentation site
+
+[tool.hpy]
+# Source directory relative to this config file (docs/src)
+input_dir = "src"
+
+# Output directory relative to this config file (docs/dist)
+# We'll build here initially, then configure deployment.
+output_dir = "dists"
+
+# Static asset directory relative to input_dir (docs/src/static)
+static_dir_name = "static"

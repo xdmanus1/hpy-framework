@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPY Application (index)</title>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython_stdlib.js"></script>
+    <style>
+/* --- Start Combined CSS (index.html) --- */
+/* Layout: _layout.hpy */
+/* Minimal layout-specific styles if needed */
+        .sidebar nav ul { list-style: none; padding-left: 0; }
+        .sidebar nav ul li { margin: 0.5em 0; }
+        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
+
+        /* Basic code block styling */
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1em;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        code {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+
+/* Page: index.hpy */
+/* Page-specific styles if needed */
+/* --- End Combined CSS --- */
+    </style>
+</head>
+<body onload="brython({'debug': 1})">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use Brython - maybe for interactive examples later? -->
+    <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython_stdlib.js"></script>
+    <!-- Link to docs-specific CSS -->
+    <link rel="stylesheet" href="/static/docs.css">
+    <!-- Title will be set per page ideally, but fallback -->
+    <title>HPY Tool Documentation</title>
+    <style>
+        /* Minimal layout-specific styles if needed */
+        .sidebar nav ul { list-style: none; padding-left: 0; }
+        .sidebar nav ul li { margin: 0.5em 0; }
+        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
+
+        /* Basic code block styling */
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1em;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        code {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+    </style>
+</head>
+<body onload="brython({{'debug': 0}})"> <!-- Disable debug for docs usually -->
+    <div class="docs-container">
+        <aside class="sidebar">
+            <h2>HPY Tool Docs</h2>
+            <nav>
+                <ul>
+                    <li><a href="/index.html" id="nav-index">Introduction</a></li>
+                    <li><a href="/getting_started.html" id="nav-getting-started">Getting Started</a></li>
+                    <li><a href="/configuration.html" id="nav-configuration">Configuration (hpy.toml)</a></li>
+                    <li><a href="/static_assets.html" id="nav-static-assets">Static Assets</a></li>
+                    <li><a href="/hpy_files.html" id="nav-hpy-files">.hpy File Structure</a></li>
+                    <li><a href="/cli_usage.html" id="nav-cli-usage">CLI Usage</a></li>
+                    <!-- Add more links as pages are created -->
+                </ul>
+            </nav>
+        </aside>
+        <main class="content">
+            <!-- Page content injected here -->
+            <h1>Introduction to HPY Tool ⚡</h1>
+<p>Welcome to the documentation for <code>hpy-tool</code>, a command-line utility designed to build and serve web applications from <code>.hpy</code> files using Brython.</p>
+<p>This tool aims to simplify the development workflow for creating interactive, Python-powered web interfaces by organizing HTML structure, CSS styling, and client-side Python logic within single-component files or structured projects with layouts.</p>
+<p><strong>Key Goals:</strong></p>
+<ul>
+    <li>Provide a simple, intuitive structure for web projects using Python in the browser.</li>
+    <li>Automate the process of combining layout, pages, and static assets.</li>
+    <li>Integrate seamlessly with Brython for client-side Python execution.</li>
+    <li>Offer a smooth development experience with features like project initialization and live reloading.</li>
+</ul>
+<p>Navigate through the sidebar to learn more about installation, usage, and features.</p>
+
+<h2>Project Status</h2>
+<p>⚠️ This project is experimental and primarily a learning exercise. While functional, expect potential bugs or rough edges. Contributions and feedback are welcome!</p>
+        </main>
+    </div>
+
+    <footer>
+        <p>HPY Tool Documentation | BSD 3-Clause Licensed</p>
+    </footer>
+
+    <script type="text/python">
+    # Simple Python to highlight the active nav link
+    from browser import window, document
+
+    current_path = window.location.pathname
+    nav_links = document.select('.sidebar nav a')
+
+    for link in nav_links:
+        link_href = link.attrs.get('href', '')
+        # Basic matching, handles trailing / or .html
+        if current_path == link_href or \
+           current_path == link_href.replace('.html', '') or \
+           current_path == link_href + 'index.html' or \
+           current_path.replace('.html', '') == link_href:
+            link.classList.add('active')
+            # Update page title based on active link text
+            document.title = f"{link.text} | HPY Tool Docs"
+            break
+    else:
+         # Fallback for index if no other match
+         if current_path == '/' or current_path.endswith('/index.html'):
+              index_link = document.select_one('#nav-index')
+              if index_link:
+                   index_link.classList.add('active')
+                   document.title = f"{index_link.text} | HPY Tool Docs"
+
+    print("Docs layout script loaded.")
+    </script>
+</body>
+
+<script type="text/python">
+# --- Start Combined Python (index.html) ---
+
+# --- HPY Tool Helper Functions (Injected) ---
+from browser import document
+import sys as _hpy_sys # Alias to avoid user conflicts
+def byid(element_id):
+    # Shortcut for document[element_id]. Returns None if ID not found.
+    try: return document[element_id]
+    except KeyError: return None
+def qs(selector):
+    # Shortcut for document.select_one(selector). Returns None if not found.
+    return document.select_one(selector)
+def qsa(selector):
+    # Shortcut for document.select(selector). Returns a list (possibly empty).
+    return document.select(selector)
+# --- End Helper Functions ---
+
+# Layout: _layout.hpy
+
+
+# Page: index.hpy
+# Page-specific python if needed
+print("Index page script loaded.")
+# --- End Combined Python ---
+</script>
+
+</body>
+</html>

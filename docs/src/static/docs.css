@@ -1,0 +1,106 @@
+/* docs/src/static/docs.css */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    color: #333;
+    background-color: #fdfdfd;
+}
+
+.docs-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    padding: 20px;
+    border-right: 1px solid #eee;
+    background-color: #f8f8f8;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+    color: #4CAF50; /* Project color */
+}
+
+.sidebar nav a {
+    text-decoration: none;
+    color: #007bff;
+    display: block;
+    padding: 0.2em 0;
+}
+
+.sidebar nav a:hover {
+    text-decoration: underline;
+}
+.sidebar nav a.active {
+   font-weight: bold;
+   color: #333;
+}
+
+
+.content {
+    flex-grow: 1;
+    padding: 20px 40px;
+    max-width: calc(100% - 280px); /* Adjust based on sidebar width + padding */
+}
+
+.content h1, .content h2, .content h3 {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3em;
+    margin-top: 1.5em;
+    margin-bottom: 1em;
+}
+ .content h1:first-child {
+    margin-top: 0;
+ }
+
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Add more styles as needed for tables, lists, alerts etc. */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1em;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .docs-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+    }
+    .content {
+         max-width: 100%;
+         padding: 20px;
+    }
+}

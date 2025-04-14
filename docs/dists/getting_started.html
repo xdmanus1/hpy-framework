@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPY Application (getting_started)</title>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython_stdlib.js"></script>
+    <style>
+/* --- Start Combined CSS (getting_started.html) --- */
+/* Layout: _layout.hpy */
+/* Minimal layout-specific styles if needed */
+        .sidebar nav ul { list-style: none; padding-left: 0; }
+        .sidebar nav ul li { margin: 0.5em 0; }
+        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
+
+        /* Basic code block styling */
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1em;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        code {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+
+/* Page: getting_started.hpy */
+/* Getting Started page specific styles if needed */
+/* --- End Combined CSS --- */
+    </style>
+</head>
+<body onload="brython({'debug': 1})">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use Brython - maybe for interactive examples later? -->
+    <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython_stdlib.js"></script>
+    <!-- Link to docs-specific CSS -->
+    <link rel="stylesheet" href="/static/docs.css">
+    <!-- Title will be set per page ideally, but fallback -->
+    <title>HPY Tool Documentation</title>
+    <style>
+        /* Minimal layout-specific styles if needed */
+        .sidebar nav ul { list-style: none; padding-left: 0; }
+        .sidebar nav ul li { margin: 0.5em 0; }
+        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
+
+        /* Basic code block styling */
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1em;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        code {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+    </style>
+</head>
+<body onload="brython({{'debug': 0}})"> <!-- Disable debug for docs usually -->
+    <div class="docs-container">
+        <aside class="sidebar">
+            <h2>HPY Tool Docs</h2>
+            <nav>
+                <ul>
+                    <li><a href="/index.html" id="nav-index">Introduction</a></li>
+                    <li><a href="/getting_started.html" id="nav-getting-started">Getting Started</a></li>
+                    <li><a href="/configuration.html" id="nav-configuration">Configuration (hpy.toml)</a></li>
+                    <li><a href="/static_assets.html" id="nav-static-assets">Static Assets</a></li>
+                    <li><a href="/hpy_files.html" id="nav-hpy-files">.hpy File Structure</a></li>
+                    <li><a href="/cli_usage.html" id="nav-cli-usage">CLI Usage</a></li>
+                    <!-- Add more links as pages are created -->
+                </ul>
+            </nav>
+        </aside>
+        <main class="content">
+            <!-- Page content injected here -->
+            <h1>Getting Started</h1>
+
+<p>Setting up and using <code>hpy-tool</code> is straightforward. Follow these steps to install the tool and initialize your first project.</p>
+
+<h2>Installation</h2>
+
+<p>A Python virtual environment is strongly recommended to manage dependencies for your project.</p>
+
+<pre><code># 1. Create and activate a virtual environment (if you haven't)
+python -m venv .venv
+
+# Linux/macOS:
+source .venv/bin/activate
+
+# Windows (CMD):
+# .venv\Scripts\activate.bat
+
+# Windows (PowerShell):
+# .venv\Scripts\Activate.ps1
+
+# 2. Install hpy-tool
+# Option A: From PyPI (Recommended once published)
+# pip install hpy-tool
+
+# Option B: From local source code (for development)
+# Navigate to the root directory of the hpy-tool project (where pyproject.toml is)
+pip install -e .
+
+# Dependencies: This installs 'watchdog' (required for -w) and 'tomli'
+# (required for hpy.toml configuration on Python < 3.11).</code></pre>
+
+<h2>Initialize Your First Project</h2>
+
+<p>The easiest way to start is by using the <code>--init</code> command.</p>
+
+<pre><code># 1. Initialize a new project directory
+hpy --init my-first-app
+
+# 2. Navigate into the project directory
+cd my-first-app</code></pre>
+
+<p>This command will prompt you to choose a template. Choosing the default (Directory with Layout) creates the following structure:</p>
+
+<pre><code>my-first-app/
+├── hpy.toml        # Project configuration file
+└── src/            # Default source directory
+    ├── _layout.hpy   # Shared layout file
+    ├── about.hpy     # Example page
+    ├── index.hpy     # Example homepage
+    └── static/       # Static asset directory
+        └── logo.svg  # Example static file</code></pre>
+
+<p>Key files generated:</p>
+<ul>
+    <li><code>hpy.toml</code>: Configures your project's input, output, and static directories.</li>
+    <li><code>src/_layout.hpy</code>: The main HTML template for all pages.</li>
+    <li><code>src/index.hpy</code>, <code>src/about.hpy</code>: Example content pages.</li>
+    <li><code>src/static/logo.svg</code>: An example static asset referenced in the layout.</li>
+</ul>
+<p><em>Important:</em> For static asset handling to work, ensure the <code>static_dir_name</code> line in your <code>hpy.toml</code> is uncommented and correctly set.</p>
+
+<h2>Run the Development Server</h2>
+
+<p>With your project initialized and dependencies installed, start the development server:</p>
+
+<pre><code># Make sure you are inside your project directory ('my-first-app')
+hpy -w</code></pre>
+
+<p>Explanation:</p>
+<ul>
+    <li><code>hpy</code>: Executes the tool.</li>
+    <li><code>-w</code> (watch mode): This flag tells <code>hpy-tool</code> to:
+        <ul>
+            <li>Perform an initial build (compiling <code>.hpy</code> files and copying static assets) based on <code>hpy.toml</code> settings (defaulting to <code>src</code> -> <code>dist</code>).</li>
+            <li>Start a development web server (defaulting to port 8000) serving the output directory (<code>dist</code>).</li>
+            <li>Watch the source directory (<code>src</code>) for changes.</li>
+            <li>Automatically rebuild relevant <code>.hpy</code> files or sync changed static assets when you save changes.</li>
+        </ul>
+    </li>
+</ul>
+
+<p>Open your web browser and navigate to <a href="http://localhost:8000">http://localhost:8000</a> (or the port shown in the console). You should see your application running!</p>
+
+<h2>Development Workflow</h2>
+<ol>
+    <li>Edit files within your source directory (<code>src/</code> by default). Modify <code>.hpy</code> pages, the layout, or add/change files in the static directory.</li>
+    <li>Save your changes.</li>
+    <li><code>hpy-tool</code> (running with <code>-w</code>) detects the changes and automatically rebuilds or syncs assets.</li>
+    <li>Refresh your web browser to see the updated application.</li>
+</ol>
+
+<p>You are now ready to start building your web application with HPY!</p>
+        </main>
+    </div>
+
+    <footer>
+        <p>HPY Tool Documentation | BSD 3-Clause Licensed</p>
+    </footer>
+
+    <script type="text/python">
+    # Simple Python to highlight the active nav link
+    from browser import window, document
+
+    current_path = window.location.pathname
+    nav_links = document.select('.sidebar nav a')
+
+    for link in nav_links:
+        link_href = link.attrs.get('href', '')
+        # Basic matching, handles trailing / or .html
+        if current_path == link_href or \
+           current_path == link_href.replace('.html', '') or \
+           current_path == link_href + 'index.html' or \
+           current_path.replace('.html', '') == link_href:
+            link.classList.add('active')
+            # Update page title based on active link text
+            document.title = f"{link.text} | HPY Tool Docs"
+            break
+    else:
+         # Fallback for index if no other match
+         if current_path == '/' or current_path.endswith('/index.html'):
+              index_link = document.select_one('#nav-index')
+              if index_link:
+                   index_link.classList.add('active')
+                   document.title = f"{index_link.text} | HPY Tool Docs"
+
+    print("Docs layout script loaded.")
+    </script>
+</body>
+
+<script type="text/python">
+# --- Start Combined Python (getting_started.html) ---
+
+# --- HPY Tool Helper Functions (Injected) ---
+from browser import document
+import sys as _hpy_sys # Alias to avoid user conflicts
+def byid(element_id):
+    # Shortcut for document[element_id]. Returns None if ID not found.
+    try: return document[element_id]
+    except KeyError: return None
+def qs(selector):
+    # Shortcut for document.select_one(selector). Returns None if not found.
+    return document.select_one(selector)
+def qsa(selector):
+    # Shortcut for document.select(selector). Returns a list (possibly empty).
+    return document.select(selector)
+# --- End Helper Functions ---
+
+# Layout: _layout.hpy
+
+
+# Page: getting_started.hpy
+print("Getting Started page script loaded.")
+# --- End Combined Python ---
+</script>
+
+</body>
+</html>

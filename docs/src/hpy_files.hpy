@@ -1,0 +1,98 @@
+<html>
+<h1>.hpy File Structure</h1>
+
+<p>The core concept of <code>hpy-tool</code> revolves around <code>.hpy</code> files. These files allow you to encapsulate HTML structure, CSS styling, and client-side Python (Brython) logic within a single file, promoting component-like organization.</p>
+
+<h2>Basic Structure</h2>
+<p>A typical <code>.hpy</code> file consists of up to three distinct sections, identified by specific HTML-like tags:</p>
+
+<ul>
+    <li><strong><code><html>...</html></code> (Required)</strong>
+        <ul>
+            <li>Contains the HTML content for the component or page.</li>
+            <li>In page files (like <code>index.hpy</code>), this content replaces the <code><!-- HPY_PAGE_CONTENT --></code> placeholder in the layout file.</li>
+            <li>In the layout file (<code>_layout.hpy</code>), this defines the main document structure and *must* include the placeholder.</li>
+            <li>Only the content *between* the first opening <code><html></code> and its corresponding closing <code></html></code> tag is used. Attributes on the tag itself are currently ignored during parsing.</li>
+        </ul>
+    </li>
+    <li><strong><code><style>...</style></code> (Optional)</strong>
+        <ul>
+            <li>Contains CSS rules.</li>
+            <li>You can have multiple <code><style></code> blocks within a single <code>.hpy</code> file; their contents will be concatenated together.</li>
+            <li>When using a layout, the CSS from the layout file is combined with the CSS from the page file (layout CSS typically comes first).</li>
+        </ul>
+    </li>
+    <li><strong><code><python>...</python></code> (Optional)</strong>
+        <ul>
+            <li>Contains Python code intended to be executed by Brython in the browser.</li>
+            <li>You can have multiple <code><python></code> blocks; their contents will be concatenated.</li>
+            <li>When using a layout, the Python code from the layout is combined with the code from the page file (layout code typically comes first).</li>
+            <li><strong>Important Indentation:</strong> The Python code directly inside the <code><python></code> tags must start with **zero** leading spaces or tabs. Indentation within functions, classes, etc., follows standard Python rules.</li>
+        </ul>
+    </li>
+</ul>
+
+<p>Example <code>.hpy</code> page file:</p>
+<pre><code><html>
+    <div class="greeting-card">
+        <h2>Welcome!</h2>
+        <p id="message">This message will be updated by Python.</p>
+        <button id="update-btn">Update Message</button>
+    </div>
+</html>
+
+<style>
+    .greeting-card {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+    #message {
+        color: blue;
+    }
+</style>
+
+<python>
+# Python code starts with no indentation here
+from browser import document, alert
+
+message_element = byid("message")  # Use injected helper
+button_element = byid("update-btn") # Use injected helper
+
+def show_new_message(event):
+    # Standard indentation inside function
+    message_element.text = "Message updated by Brython!"
+    alert("Message updated!")
+
+button_element.bind("click", show_new_message)
+
+print("Page script executed.")
+</python>
+</code></pre>
+
+<h2>Layout File (`_layout.hpy`)</h2>
+<p>The layout file (conventionally named <code>_layout.hpy</code> in the root of your source directory) follows the same structure but has a special requirement:</p>
+<ul>
+    <li>Its <code><html></code> section must contain the exact placeholder comment: <code><!-- HPY_PAGE_CONTENT --></code>.</li>
+    <li>The content of the <code><html></code> block from the specific page being built will replace this placeholder.</li>
+</ul>
+
+<h2>DOM Helper Functions</h2>
+<p>To simplify common JavaScript DOM operations within your Python code, <code>hpy-tool</code> automatically injects the following helper functions into the combined Python script:</p>
+<ul>
+    <li><strong><code>byid(element_id: str)</code></strong>: Shortcut for <code>document[element_id]</code>. Returns the element with the given ID, or <code>None</code> if not found (unlike <code>document[]</code> which raises a `KeyError`).</li>
+    <li><strong><code>qs(selector: str)</code></strong>: Shortcut for <code>document.select_one(selector)</code>. Returns the first element matching the CSS selector, or <code>None</code> if not found.</li>
+    <li><strong><code>qsa(selector: str)</code></strong>: Shortcut for <code>document.select(selector)</code>. Returns a list of all elements matching the CSS selector (the list may be empty).</li>
+</ul>
+<p>Using these helpers can make your Brython code cleaner and more concise.</p>
+
+</html>
+
+<style>
+/* .hpy Files page specific styles */
+</style>
+
+<python>
+print(".hpy Files page script loaded.")
+</python>

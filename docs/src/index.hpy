@@ -1,0 +1,25 @@
+<html>
+<h1>Introduction to HPY Tool ⚡</h1>
+<p>Welcome to the documentation for <code>hpy-tool</code>, a command-line utility designed to build and serve web applications from <code>.hpy</code> files using Brython.</p>
+<p>This tool aims to simplify the development workflow for creating interactive, Python-powered web interfaces by organizing HTML structure, CSS styling, and client-side Python logic within single-component files or structured projects with layouts.</p>
+<p><strong>Key Goals:</strong></p>
+<ul>
+    <li>Provide a simple, intuitive structure for web projects using Python in the browser.</li>
+    <li>Automate the process of combining layout, pages, and static assets.</li>
+    <li>Integrate seamlessly with Brython for client-side Python execution.</li>
+    <li>Offer a smooth development experience with features like project initialization and live reloading.</li>
+</ul>
+<p>Navigate through the sidebar to learn more about installation, usage, and features.</p>
+
+<h2>Project Status</h2>
+<p>⚠️ This project is experimental and primarily a learning exercise. While functional, expect potential bugs or rough edges. Contributions and feedback are welcome!</p>
+</html>
+
+<style>
+/* Page-specific styles if needed */
+</style>
+
+<python>
+# Page-specific python if needed
+print("Index page script loaded.")
+</python>   

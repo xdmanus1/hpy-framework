@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPY Application (hpy_files)</title>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython_stdlib.js"></script>
+    <style>
+/* --- Start Combined CSS (hpy_files.html) --- */
+/* Layout: _layout.hpy */
+/* Minimal layout-specific styles if needed */
+        .sidebar nav ul { list-style: none; padding-left: 0; }
+        .sidebar nav ul li { margin: 0.5em 0; }
+        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
+
+        /* Basic code block styling */
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1em;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        code {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+
+/* Page: hpy_files.hpy */
+...
+
+</code> blocks within a single <code>.hpy</code> file; their contents will be concatenated together.</li>
+            <li>When using a layout, the CSS from the layout file is combined with the CSS from the page file (layout CSS typically comes first).</li>
+        </ul>
+    </li>
+    <li><strong><code><python>...</python></code> (Optional)</strong>
+        <ul>
+            <li>Contains Python code intended to be executed by Brython in the browser.</li>
+            <li>You can have multiple <code><python></code> blocks; their contents will be concatenated.</li>
+            <li>When using a layout, the Python code from the layout is combined with the code from the page file (layout code typically comes first).</li>
+            <li><strong>Important Indentation:</strong> The Python code directly inside the <code><python></code> tags must start with **zero** leading spaces or tabs. Indentation within functions, classes, etc., follows standard Python rules.</li>
+        </ul>
+    </li>
+</ul>
+
+<p>Example <code>.hpy</code> page file:</p>
+<pre><code><html>
+    <div class="greeting-card">
+        <h2>Welcome!</h2>
+        <p id="message">This message will be updated by Python.</p>
+        <button id="update-btn">Update Message</button>
+    </div>
+</html>
+
+<style>
+    .greeting-card {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+    #message {
+        color: blue;
+    }
+
+/* .hpy Files page specific styles */
+/* --- End Combined CSS --- */
+    </style>
+</head>
+<body onload="brython({'debug': 1})">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use Brython - maybe for interactive examples later? -->
+    <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython_stdlib.js"></script>
+    <!-- Link to docs-specific CSS -->
+    <link rel="stylesheet" href="/static/docs.css">
+    <!-- Title will be set per page ideally, but fallback -->
+    <title>HPY Tool Documentation</title>
+    <style>
+        /* Minimal layout-specific styles if needed */
+        .sidebar nav ul { list-style: none; padding-left: 0; }
+        .sidebar nav ul li { margin: 0.5em 0; }
+        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
+
+        /* Basic code block styling */
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1em;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        code {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+    </style>
+</head>
+<body onload="brython({{'debug': 0}})"> <!-- Disable debug for docs usually -->
+    <div class="docs-container">
+        <aside class="sidebar">
+            <h2>HPY Tool Docs</h2>
+            <nav>
+                <ul>
+                    <li><a href="/index.html" id="nav-index">Introduction</a></li>
+                    <li><a href="/getting_started.html" id="nav-getting-started">Getting Started</a></li>
+                    <li><a href="/configuration.html" id="nav-configuration">Configuration (hpy.toml)</a></li>
+                    <li><a href="/static_assets.html" id="nav-static-assets">Static Assets</a></li>
+                    <li><a href="/hpy_files.html" id="nav-hpy-files">.hpy File Structure</a></li>
+                    <li><a href="/cli_usage.html" id="nav-cli-usage">CLI Usage</a></li>
+                    <!-- Add more links as pages are created -->
+                </ul>
+            </nav>
+        </aside>
+        <main class="content">
+            <!-- Page content injected here -->
+            <h1>.hpy File Structure</h1>
+
+<p>The core concept of <code>hpy-tool</code> revolves around <code>.hpy</code> files. These files allow you to encapsulate HTML structure, CSS styling, and client-side Python (Brython) logic within a single file, promoting component-like organization.</p>
+
+<h2>Basic Structure</h2>
+<p>A typical <code>.hpy</code> file consists of up to three distinct sections, identified by specific HTML-like tags:</p>
+
+<ul>
+    <li><strong><code><html>...
+        </main>
+    </div>
+
+    <footer>
+        <p>HPY Tool Documentation | BSD 3-Clause Licensed</p>
+    </footer>
+
+    <script type="text/python">
+    # Simple Python to highlight the active nav link
+    from browser import window, document
+
+    current_path = window.location.pathname
+    nav_links = document.select('.sidebar nav a')
+
+    for link in nav_links:
+        link_href = link.attrs.get('href', '')
+        # Basic matching, handles trailing / or .html
+        if current_path == link_href or \
+           current_path == link_href.replace('.html', '') or \
+           current_path == link_href + 'index.html' or \
+           current_path.replace('.html', '') == link_href:
+            link.classList.add('active')
+            # Update page title based on active link text
+            document.title = f"{link.text} | HPY Tool Docs"
+            break
+    else:
+         # Fallback for index if no other match
+         if current_path == '/' or current_path.endswith('/index.html'):
+              index_link = document.select_one('#nav-index')
+              if index_link:
+                   index_link.classList.add('active')
+                   document.title = f"{index_link.text} | HPY Tool Docs"
+
+    print("Docs layout script loaded.")
+    </script>
+</body>
+
+<script type="text/python">
+# --- Start Combined Python (hpy_files.html) ---
+
+# --- HPY Tool Helper Functions (Injected) ---
+from browser import document
+import sys as _hpy_sys # Alias to avoid user conflicts
+def byid(element_id):
+    # Shortcut for document[element_id]. Returns None if ID not found.
+    try: return document[element_id]
+    except KeyError: return None
+def qs(selector):
+    # Shortcut for document.select_one(selector). Returns None if not found.
+    return document.select_one(selector)
+def qsa(selector):
+    # Shortcut for document.select(selector). Returns a list (possibly empty).
+    return document.select(selector)
+# --- End Helper Functions ---
+
+# Layout: _layout.hpy
+
+
+# Page: hpy_files.hpy
+...
+
+</code> blocks; their contents will be concatenated.</li>
+            <li>When using a layout, the Python code from the layout is combined with the code from the page file (layout code typically comes first).</li>
+            <li><strong>Important Indentation:</strong> The Python code directly inside the <code><python></code> tags must start with **zero** leading spaces or tabs. Indentation within functions, classes, etc., follows standard Python rules.</li>
+        </ul>
+    </li>
+</ul>
+
+<p>Example <code>.hpy</code> page file:</p>
+<pre><code><html>
+    <div class="greeting-card">
+        <h2>Welcome!</h2>
+        <p id="message">This message will be updated by Python.</p>
+        <button id="update-btn">Update Message</button>
+    </div>
+</html>
+
+<style>
+    .greeting-card {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+    #message {
+        color: blue;
+    }
+</style>
+
+<python>
+# Python code starts with no indentation here
+from browser import document, alert
+
+message_element = byid("message")  # Use injected helper
+button_element = byid("update-btn") # Use injected helper
+
+def show_new_message(event):
+    # Standard indentation inside function
+    message_element.text = "Message updated by Brython!"
+    alert("Message updated!")
+
+button_element.bind("click", show_new_message)
+
+print("Page script executed.")
+
+print(".hpy Files page script loaded.")
+# --- End Combined Python ---
+</script>
+
+</body>
+</html>
