@@ -97,7 +97,6 @@ except Exception as e:
     print(f"Error in layout navigation script: {e}", file=sys.stderr)
 
 print("Docs layout script loaded.")
-</script> # Make sure this closing tag is aligned as needed
-
+</script>
 </body>
 </html>
