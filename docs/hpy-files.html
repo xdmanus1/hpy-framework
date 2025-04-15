@@ -3,16 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HPY Application (configuration)</title>
+    <title>HPY Application (hpy-files)</title>
     <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/brython@3.11.3/brython_stdlib.js"></script>
     <style>
-/* --- Start Combined CSS (configuration.html) --- */
-/* Layout: _layout.hpy */
-/* ... existing styles ... */
 
-/* Page: configuration.hpy */
-/* Configuration page specific styles */
 /* --- End Combined CSS --- */
     </style>
 </head>
@@ -29,7 +24,7 @@
         /* ... existing styles ... */
     </style>
 </head>
-<body onload="brython({{'debug': 0}})">
+<body onload="brython({'debug': 0})">
     <div class="docs-container">
         <aside class="sidebar">
             <h2>HPY Tool Docs</h2>
@@ -45,63 +40,9 @@
             </nav>
         </aside>
         <main class="content">
-            <h1>Configuration (hpy.toml)</h1>
+            <h1>.hpy File Structure W.I.P.</h1>
 
-<p><code>hpy-tool</code> uses a configuration file named <code>hpy.toml</code> located in the root of your project directory to manage common settings. This allows you to define project structure without relying solely on command-line arguments.</p>
 
-<h2>Finding the Configuration</h2>
-<p>When you run <code>hpy</code> commands like <code>hpy build</code> or <code>hpy -w</code>, the tool automatically searches for <code>hpy.toml</code> by looking in the specified input directory (or the default <code>src/</code>) and then checking its parent directories upwards until it finds the file or reaches the filesystem root.</p>
-<p>The directory containing <code>hpy.toml</code> is considered the **project root**. Paths defined within the configuration file are relative to this root, unless specified otherwise.</p>
-
-<h2>File Format</h2>
-<p>The configuration uses the TOML format. All <code>hpy-tool</code> specific settings must reside within the <code>[tool.hpy]</code> table.</p>
-
-<pre><code># hpy.toml Example
-
-# This table contains all settings for hpy-tool
-[tool.hpy]
-
-# Path to the directory containing your source .hpy files and static directory.
-# Relative to the project root (where hpy.toml lives).
-input_dir = "src"
-
-# Path to the directory where compiled HTML and copied static assets will be placed.
-# Relative to the project root.
-output_dir = "dist"
-
-# The name of the directory *inside* input_dir that holds static assets.
-# Setting this enables static file handling. Contents are copied to output_dir/<static_dir_name>.
-# This line must be uncommented for static files to be processed.
-static_dir_name = "static"
-
-# --- Future settings might be added here ---
-</code></pre>
-
-<h2>Available Settings</h2>
-<ul>
-    <li>
-        <p><strong><code>input_dir</code></strong> (string, default: <code>"src"</code>)</p>
-        <p>Specifies the directory containing your source <code>.hpy</code> files (including <code>_layout.hpy</code>) and your static asset directory (named by <code>static_dir_name</code>). Path is relative to the project root.</p>
-    </li>
-    <li>
-        <p><strong><code>output_dir</code></strong> (string, default: <code>"dist"</code>)</p>
-        <p>Specifies the directory where the compiled HTML files and copied static assets will be generated. Path is relative to the project root.</p>
-    </li>
-    <li>
-        <p><strong><code>static_dir_name</code></strong> (string, default: <code>"static"</code>)</p>
-        <p>Defines the name of the directory <em>within</em> <code>input_dir</code> that contains your static assets (e.g., CSS, images, fonts). <strong>This setting must be explicitly defined (uncommented) in <code>hpy.toml</code> to enable static asset handling.</strong> If enabled, files and directories from <code><input_dir>/<static_dir_name>/</code> will be copied to <code><output_dir>/<static_dir_name>/</code> during builds and synced during watch mode.</p>
-    </li>
-</ul>
-
-<h2>Precedence Rules</h2>
-<p>Settings are determined based on the following order of precedence (highest priority first):</p>
-<ol>
-    <li><strong>Command-Line Arguments:</strong> Flags like <code>-o <dir></code> or providing a specific <code>SOURCE</code> path on the command line always override any other settings.</li>
-    <li><strong><code>hpy.toml</code> Settings:</strong> If a setting is not provided via a CLI argument, the value defined in the <code>[tool.hpy]</code> table of <code>hpy.toml</code> is used.</li>
-    <li><strong>Built-in Defaults:</strong> If a setting is not provided via CLI or <code>hpy.toml</code>, the tool falls back to its built-in defaults (e.g., <code>input_dir = "src"</code>, <code>output_dir = "dist"</code>).</li>
-</ol>
-
-<p>This allows you to set up standard project conventions in <code>hpy.toml</code> while still having the flexibility to override them for specific commands when needed.</p>
         </main>
     </div>
 
@@ -176,7 +117,7 @@ print("Docs layout script loaded.")
 </body>
 
 <script type="text/python">
-# --- Start Combined Python (configuration.html) ---
+# --- Start Combined Python (hpy-files.html) ---
 
 # --- HPY Tool Helper Functions (Injected) ---
 from browser import document
@@ -196,8 +137,39 @@ def qsa(selector):
 # Layout: _layout.hpy
 
 
-# Page: configuration.hpy
-print("Configuration page script loaded.")
+# Page: hpy-files.hpy
+...
+
+</code> blocks; their contents will be concatenated.</li>
+            <li><strong>Important Indentation:</strong> The Python code directly inside the <code><python></code> tags must start with **zero** leading spaces or tabs.</li>
+        </ul>
+    </li>
+</ul>
+
+<h2>Example of a Page File</h2>
+<p>Imagine you are creating a simple greeting card component in a file named <code>greeting.hpy</code>. It would contain separate blocks for HTML, CSS, and Python.</p>
+
+<p><strong>1. HTML Block Content (inside `<html>...</html>` tags):</strong></p>
+<pre><code><!-- greeting.hpy HTML content -->
+<div class="greeting-card">
+    <h2>Welcome!</h2>
+    <p id="message">This message will be updated by Python.</p>
+    <button id="update-btn">Update Message</button>
+</div></code></pre>
+
+<p><strong>2. CSS Block Content (inside `<style>...</style>` tags):</strong></p>
+<pre><code class="language-css">/* greeting.hpy CSS */
+.greeting-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+#message {
+    color: blue;
+}</code></pre>
+
+<p><strong>3. Python Block Content (inside `<python>...
 # --- End Combined Python ---
 </script>
 

@@ -1,0 +1,101 @@
+<!-- docs/src/hpy-files.hpy (NO PYTHON BLOCK) -->
+<html>
+<h1>.hpy File Structure</h1>
+
+<p>The core concept of <code>hpy-tool</code> revolves around <code>.hpy</code> files. These files allow you to encapsulate HTML structure, CSS styling, and client-side Python (Brython) logic within a single file, promoting component-like organization.</p>
+
+<h2>Basic Structure</h2>
+<p>A typical <code>.hpy</code> file consists of up to three distinct sections, identified by specific HTML-like tags:</p>
+
+<ul>
+    <li><strong><code><html>...</html></code> (Required)</strong>
+        <ul>
+            <li>Contains the HTML content for the component or page.</li>
+            <li>In page files (like <code>index.hpy</code>), this content replaces the <code><!-- HPY_PAGE_CONTENT --></code> placeholder in the layout file.</li>
+            <li>In the layout file (<code>_layout.hpy</code>), this defines the main document structure and *must* include the placeholder.</li>
+        </ul>
+    </li>
+    <li><strong><code><style>...</style></code> (Optional)</strong>
+        <ul>
+            <li>Contains CSS rules.</li>
+            <li>You can have multiple <code><style></code> blocks; their contents will be concatenated.</li>
+        </ul>
+    </li>
+    <li><strong><code><python>...</python></code> (Optional)</strong>
+        <ul>
+            <li>Contains Python code intended to be executed by Brython in the browser.</li>
+            <li>You can have multiple <code><python></code> blocks; their contents will be concatenated.</li>
+            <li><strong>Important Indentation:</strong> The Python code directly inside the <code><python></code> tags must start with **zero** leading spaces or tabs.</li>
+        </ul>
+    </li>
+</ul>
+
+<h2>Example of a Page File</h2>
+<p>Imagine you are creating a simple greeting card component in a file named <code>greeting.hpy</code>. It would contain separate blocks for HTML, CSS, and Python.</p>
+
+<p><strong>1. HTML Block Content (inside `<html>...</html>` tags):</strong></p>
+<pre><code><!-- greeting.hpy HTML content -->
+<div class="greeting-card">
+    <h2>Welcome!</h2>
+    <p id="message">This message will be updated by Python.</p>
+    <button id="update-btn">Update Message</button>
+</div></code></pre>
+
+<p><strong>2. CSS Block Content (inside `<style>...</style>` tags):</strong></p>
+<pre><code class="language-css">/* greeting.hpy CSS */
+.greeting-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+#message {
+    color: blue;
+}</code></pre>
+
+<p><strong>3. Python Block Content (inside `<python>...</python>` tags):</strong></p>
+<p>Remember, this code must start with no leading indentation within the actual tags.</p>
+<pre><code class="language-python"># greeting.hpy Python code
+from browser import document, alert
+
+message_element = byid("message")  # Use injected helper
+button_element = byid("update-btn") # Use injected helper
+
+def show_new_message(event):
+    # Standard indentation inside function
+    message_element.text = "Message updated by Brython!"
+    alert("Message updated!")
+
+button_element.bind("click", show_new_message)
+
+print("Greeting component script executed.")</code></pre>
+
+<p>When <code>hpy-tool</code> processes this file (potentially applying a layout), it will extract each of these sections, combine them appropriately (e.g., merging CSS and Python with the layout's code), and generate the final HTML output where the Python code will be executed by Brython.</p>
+
+
+<h2>Layout File (`_layout.hpy`)</h2>
+<p>The layout file (conventionally named <code>_layout.hpy</code>) follows the same structure but requires the placeholder comment <code><!-- HPY_PAGE_CONTENT --></code> within its <code><html></code> block. The HTML content from the page file replaces this placeholder during the build.</p>
+
+<h2>DOM Helper Functions</h2>
+<p>These helper functions are automatically available in your Python code blocks:</p>
+<ul>
+    <li><strong><code>byid(id)</code></strong>: Get element by ID (returns <code>None</code> if not found).</li>
+    <li><strong><code>qs(selector)</code></strong>: Get first element matching CSS selector (returns <code>None</code> if not found).</li>
+    <li><strong><code>qsa(selector)</code></strong>: Get a list of all elements matching CSS selector.</li>
+</ul>
+
+
+</html>
+
+<style>
+/* .hpy Files page specific styles */
+/* Style block can remain, it shouldn't cause Python errors */
+.example-note {
+    font-style: italic;
+    color: #555;
+    margin-top: -1em;
+    margin-bottom: 1.5em;
+}
+</style>
+
+<!-- NO <python> block in this version -->

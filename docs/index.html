@@ -9,29 +9,7 @@
     <style>
 /* --- Start Combined CSS (index.html) --- */
 /* Layout: _layout.hpy */
-/* Minimal layout-specific styles if needed */
-        .sidebar nav ul { list-style: none; padding-left: 0; }
-        .sidebar nav ul li { margin: 0.5em 0; }
-        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
-
-        /* Basic code block styling */
-        pre {
-            background-color: #f4f4f4;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 1em;
-            overflow-x: auto;
-            font-family: monospace;
-            font-size: 0.9em;
-        }
-        code {
-            font-family: monospace;
-            background-color: #eee;
-            padding: 0.2em 0.4em;
-            border-radius: 3px;
-            font-size: 0.9em;
-        }
-        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+/* ... existing styles ... */
 
 /* Page: index.hpy */
 /* Page-specific styles if needed */
@@ -45,33 +23,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/brython@{{ BRYTHON_VERSION }}/brython_stdlib.js"></script>
-    <!-- Change CSS link to be relative -->
     <link rel="stylesheet" href="static/docs.css">
     <title>HPY Tool Documentation</title>
     <style>
-        /* Minimal layout-specific styles if needed */
-        .sidebar nav ul { list-style: none; padding-left: 0; }
-        .sidebar nav ul li { margin: 0.5em 0; }
-        .sidebar nav ul a.active { font-weight: bold; text-decoration: underline; }
-
-        /* Basic code block styling */
-        pre {
-            background-color: #f4f4f4;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 1em;
-            overflow-x: auto;
-            font-family: monospace;
-            font-size: 0.9em;
-        }
-        code {
-            font-family: monospace;
-            background-color: #eee;
-            padding: 0.2em 0.4em;
-            border-radius: 3px;
-            font-size: 0.9em;
-        }
-        pre code { background-color: transparent; padding: 0; border-radius: 0; }
+        /* ... existing styles ... */
     </style>
 </head>
 <body onload="brython({{'debug': 0}})">
@@ -80,18 +35,16 @@
             <h2>HPY Tool Docs</h2>
             <nav>
                 <ul>
-                    <!-- Change nav links to be relative -->
                     <li><a href="index.html" id="nav-index">Introduction</a></li>
-                    <li><a href="getting_started.html" id="nav-getting-started">Getting Started</a></li>
+                    <li><a href="getting-started.html" id="nav-getting-started">Getting Started</a></li>
                     <li><a href="configuration.html" id="nav-configuration">Configuration (hpy.toml)</a></li>
-                    <li><a href="static_assets.html" id="nav-static-assets">Static Assets</a></li>
-                    <li><a href="hpy_files.html" id="nav-hpy-files">.hpy File Structure</a></li>
-                    <li><a href="cli_usage.html" id="nav-cli-usage">CLI Usage</a></li>
+                    <li><a href="static-assets.html" id="nav-static-assets">Static Assets</a></li>
+                    <li><a href="hpy-files.html" id="nav-hpy-files">.hpy File Structure</a></li>
+                    <li><a href="cli-usage.html" id="nav-cli-usage">CLI Usage</a></li>
                 </ul>
             </nav>
         </aside>
         <main class="content">
-            <!-- Page content injected here -->
             <h1>Introduction to HPY Tool ⚡</h1>
 <p>Welcome to the documentation for <code>hpy-tool</code>, a command-line utility designed to build and serve web applications from <code>.hpy</code> files using Brython.</p>
 <p>This tool aims to simplify the development workflow for creating interactive, Python-powered web interfaces by organizing HTML structure, CSS styling, and client-side Python logic within single-component files or structured projects with layouts.</p>
@@ -113,36 +66,70 @@
         <p>HPY Tool Documentation | BSD 3-Clause Licensed</p>
     </footer>
 
-    <script type="text/python">
-    # Adjusted Python to highlight the active nav link using relative paths
-    from browser import window, document
+<script type="text/python">
+# Refined Python script in _layout.hpy (v3) <--- NO LEADING SPACES on this line
+from browser import window, document
+import sys # For potential exception printing
 
-    # Get the filename part of the current URL path
-    current_page = window.location.pathname.split('/')[-1]
-    if not current_page or current_page == 'hpy-framework': # Handle root index.html case for gh-pages
-        current_page = 'index.html'
+try:
+    # --- Get current page filename ---
+    current_pathname = window.location.pathname
+    # Remove trailing slash if present
+    if current_pathname.endswith('/'):
+        current_pathname = current_pathname[:-1]
+    # Get the last part of the path
+    current_page_filename = current_pathname.split('/')[-1]
+    # If the last part is empty or the repo name, assume it's index.html
+    # Adjust 'hpy-framework' if your repo name differs and causes issues
+    if not current_page_filename or current_page_filename == 'hpy-framework':
+        current_page_filename = 'index.html'
 
+    # --- Iterate through links ---
     nav_links = document.select('.sidebar nav a')
+    active_link_found = False
 
     for link in nav_links:
         link_href = link.attrs.get('href', '')
-        link_page = link_href.split('/')[-1] # Get filename from link href
+        # Get the filename part from the href (should be simple like 'page.html')
+        link_page_filename = link_href.split('/')[-1]
+        if not link_page_filename: # Handle case href="/"
+             link_page_filename = 'index.html'
 
-        if current_page == link_page:
+        # --- Debugging ---
+        # print(f"Current URL Filename: '{current_page_filename}', Link Filename: '{link_page_filename}' (Href: '{link_href}')")
+        # --- End Debugging ---
+
+        # Compare filenames directly
+        if current_page_filename == link_page_filename:
             link.classList.add('active')
-            # Update page title based on active link text
-            document.title = f"{link.text} | HPY Tool Docs"
-            break
-    else:
-        # If no exact match, check if we are on the implicit index page '/'
-        if current_page == 'index.html':
-             index_link = document.select_one('#nav-index')
-             if index_link:
-                  index_link.classList.add('active')
-                  document.title = f"{index_link.text} | HPY Tool Docs"
+            document.title = f"{link.text} | HPY Tool Docs" # Set title
+            active_link_found = True
+            # Don't break here if multiple links could potentially match break
 
-    print("Docs layout script loaded.")
-    </script>
+    # If after checking all links, none matched BUT we are on the root, activate index
+    if not active_link_found and current_page_filename == 'index.html':
+         index_link = document.select_one('a[href="index.html"]') # Use specific selector
+         if index_link:
+              index_link.classList.add('active')
+              # Ensure title is set for index if accessed via root path
+              if document.title == "HPY Tool Documentation":
+                   document.title = f"{index_link.text} | HPY Tool Docs"
+
+
+    # Final check: If title is still the default, maybe set it based on h1?
+    if document.title == "HPY Tool Documentation":
+         main_h1 = document.select_one('.content h1')
+         if main_h1:
+              document.title = f"{main_h1.text} | HPY Tool Docs"
+
+
+except Exception as e:
+    # Log any error during script execution to the console
+    print(f"Error in layout navigation script: {e}", file=sys.stderr)
+
+print("Docs layout script loaded.")
+</script> # Make sure this closing tag is aligned as needed
+
 </body>
 
 <script type="text/python">
