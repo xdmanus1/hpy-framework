@@ -1,0 +1,11 @@
+<hpy-head>
+    <title>Blank HPY Project - {CURRENT_YEAR}</title>
+    <style>
+        body { margin: 20px; font-family: sans-serif; }
+        .placeholder-text { color: #777; font-style: italic; }
+    </style>
+</hpy-head>
+<hpy-body>
+    <p class="placeholder-text">({LAYOUT_FILENAME} content - Add your main page structure here that uses {LAYOUT_PLACEHOLDER})</p>
+    {LAYOUT_PLACEHOLDER}
+</hpy-body>

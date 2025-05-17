@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPY Single File Application</title>
+    <script src="https://cdn.jsdelivr.net/npm/brython@{BRYTHON_VERSION}/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@{BRYTHON_VERSION}/brython_stdlib.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #e9e9e9; color: #333; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #005A9C; }
+        button {
+            background-color: #0078D4; color: white; padding: 10px 20px; border: none;
+            border-radius: 5px; cursor: pointer; font-size: 1em; margin-top: 10px;
+        }
+        button:hover { background-color: #005A9C; }
+        #outputDiv { margin-top: 20px; padding: 15px; background-color: #f0f0f0; border-left: 5px solid #0078D4; }
+    </style>
+</head>
+<body onload="brython({'debug': 1})">
+    <div class="container">
+        <h1>HPY Single File Demo</h1>
+        <p>This is a standalone HPY application with integrated HTML, CSS, and Python.</p>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+        <button id="greetButton">Greet Me</button>
+        <div id="outputDiv">Greeting will appear here.</div>
+    </div>
+
+    <script type="text/python">
+from browser import document, html
+
+output_div = document["outputDiv"]
+
+def greet(event):
+    name = document["nameInput"].value
+    if name.strip():
+        output_div.text = f"Hello, {name}! Welcome to HPY." # Normal Python f-string
+    else:
+        output_div.text = "Please enter your name first."
+
+document["greetButton"].bind("click", greet)
+
+print("Single file HPY application script loaded.")
+    </script>
+</body>
+</html>

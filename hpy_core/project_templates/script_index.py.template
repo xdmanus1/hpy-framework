@@ -1,0 +1,24 @@
+# src/index.py
+from browser import document, html
+
+print("Python from index.py is running.")
+
+button = document["index-button"] 
+output_div = document["index-output"]
+count = 0 # This is a Python variable
+
+def handle_click(event):
+    global count
+    count += 1
+    if output_div:
+        new_paragraph = html.P(f"index.py: Button clicked {count} times.") # Normal Python f-string
+        output_div <= new_paragraph
+    else:
+        print("index.py: Error: Output div #index-output not found.")
+
+if button:
+    button.bind("click", handle_click)
+    if output_div:
+        output_div.text = "index.py has initialized and is ready."
+else:
+    print("index.py: Error: Button #index-button not found.")

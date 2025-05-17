@@ -1,0 +1,22 @@
+# src/scripts/about_logic.py
+from browser import document, html
+import time
+
+print("Python from about_logic.py is running.")
+
+message_div = document["about-message"] # Assuming direct ID access is fine
+button = document["about-page-button"] # Assuming direct ID access
+
+def update_message_content(event):
+    if message_div:
+        current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        message_div.text = f"Message updated by about_logic.py at {current_time_str} UTC." # Normal Python f-string
+    else:
+        print("about_logic.py: Message div #about-message not found.")
+
+if button:
+    button.bind("click", update_message_content)
+    if message_div: 
+        message_div.text = "about_logic.py is ready. Click the button!"
+else:
+    print("about_logic.py: Button #about-page-button not found.")

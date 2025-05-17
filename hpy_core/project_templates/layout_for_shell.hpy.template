@@ -1,0 +1,91 @@
+<hpy-head>
+   
+    <title>HPY Project Layout</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .app-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+        header.main-header {
+            background: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        header.main-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        nav.main-nav ul {
+            padding: 0;
+            list-style: none;
+            text-align: center;
+        }
+        nav.main-nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+        nav.main-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav.main-nav a:hover {
+            text-decoration: underline;
+        }
+        main.content-area {
+            padding: 1rem 0;
+        }
+        footer.main-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #333;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        .logo-placeholder {
+            font-weight: bold;
+            color: #fff; 
+        }
+    </style>
+</hpy-head>
+
+<hpy-body>
+    <div class="app-container">
+        <header class="main-header">
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about.html">About</a></li>
+                    <li><a href="/{DEFAULT_STATIC_DIR_NAME}/logo.svg" class="logo-placeholder">Logo</a></li>
+                </ul>
+            </nav>
+            <h1>Welcome to My HPY Site</h1>
+        </header>
+
+        <main class="content-area">
+            {LAYOUT_PLACEHOLDER}
+        </main>
+
+        <footer class="main-footer">
+            <p>© {CURRENT_YEAR} HPY Tool Project. All rights reserved.</p>
+        </footer>
+    </div>
+    <script type="text/python">
+print("Layout (_layout.hpy) Python loaded.")
+    </script>
+</hpy-body>

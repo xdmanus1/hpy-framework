@@ -1,0 +1,19 @@
+<html>
+    <div class="page-specific-content">
+        <h2>About Us</h2>
+        <p>This is the about page content from <code>about.hpy</code>.</p>
+        <p>This page's Python logic is explicitly sourced from <code>scripts/about_logic.py</code>.</p>
+        <div id="about-message" style="color: green; font-style: italic;">Default about message.</div>
+        <button id="about-page-button">Test About Script</button>
+    </div>
+</html>
+
+<style>
+    .page-specific-content h2 { color: #6f42c1; } 
+    #about-page-button { background-color: #6f42c1; color:white; padding: 8px 15px; border:none; border-radius:3px; cursor:pointer; }
+    #about-page-button:hover { background-color: #593695; }
+</style>
+
+<python src="scripts/about_logic.py">
+# Inline Python is ignored due to 'src' attribute.
+</python>

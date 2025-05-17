@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My HPY Application</title>
+    <script src="https://cdn.jsdelivr.net/npm/brython@{BRYTHON_VERSION}/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@{BRYTHON_VERSION}/brython_stdlib.js"></script>
+    {APP_SHELL_HEAD_PLACEHOLDER}
+</head>
+<body onload="brython({'debug': 1})">
+    {APP_SHELL_BODY_PLACEHOLDER}
+</body>
+</html>

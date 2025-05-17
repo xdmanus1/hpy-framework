@@ -30,3 +30,4 @@ dist/
 # yes
 .idx
 .test
+.pytest_cache

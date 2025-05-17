@@ -1,0 +1,29 @@
+<html>
+    <div class="page-specific-content">
+        <h2>Home Page</h2>
+        <p>This is the main content area for the home page, defined in <code>index.hpy</code>.</p>
+        <p>It uses the common layout defined in <code>_layout.hpy</code>, which is then placed into <code>_app.html</code>.</p>
+        <button id="index-button">Click Me (Index Page)</button>
+        <div id="index-output" style="margin-top: 10px; border: 1px solid #ccc; padding: 10px; min-height: 30px;"></div>
+    </div>
+</html>
+
+<style>
+    .page-specific-content h2 { color: #007bff; }
+    #index-button { background-color: #007bff; color:white; padding: 8px 15px; border:none; border-radius:3px; cursor:pointer; }
+    #index-button:hover { background-color: #0056b3; }
+</style>
+
+<python>
+# This Python is for index.hpy.
+# It will be overridden if 'index.py' exists by convention.
+# from browser import document
+# try:
+#     if document["index-button"]:
+#         def index_action(ev):
+#             document["index-output"].html += "Inline index.hpy button clicked!<br>"
+#         document["index-button"].bind("click", index_action)
+# except KeyError:
+#     pass 
+# print("Inline Python from index.hpy executed.")
+</python>
