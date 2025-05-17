@@ -1,189 +1,183 @@
-# HPY Tool ⚡ v0.7.1 <!-- Tentative version bump -->
+# HPY Tool ⚡ v0.7.7
 
 [![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg?style=flat-square)](https://opensource.org/licenses/BSD-3-Clause)
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg?style=flat-square)](https://www.python.org/downloads/)
-<!-- Optional: Add PyPI badge if published -->
 <!-- [![PyPI version](https://img.shields.io/pypi/v/hpy-tool.svg?style=flat-square)](https://pypi.org/project/hpy-tool/) -->
 
 **Initialize, configure, build, serve, and live-reload web applications from structured `.hpy` projects (HTML + CSS + Python + Static Assets) using the magic of [Brython](https://brython.info)! ✨**
 
-`hpy-tool` streamlines creating interactive web applications by processing `.hpy` files, external Python scripts, static assets, and directories. Define shared layouts and individual pages, keeping structure (`<html>`), styling (`<style>`), and client-side logic (`<python>` or external `.py`) organized. Use a simple `hpy.toml` file for project configuration. `hpy-tool` bundles everything into standard HTML files where your Python code runs directly in the browser, powered by Brython, and manages your static assets and external scripts.
+`hpy-tool` streamlines creating interactive web applications by processing a root HTML application shell (`_app.html`), layout files (`_layout.hpy`), page-specific `.hpy` files, external Python scripts, static assets, and directories. Define a global app structure, shared layouts, and individual pages, keeping structure, styling, and client-side logic organized. Use a simple `hpy.toml` file for project configuration. `hpy-tool` bundles everything into standard HTML files where your Python code runs directly in the browser (powered by Brython), manages your static assets, and handles different build outputs for development and production.
 
 Inspired by the simplicity of tools like SvelteKit, this tool aims to provide a straightforward development experience for Brython-based projects.
 
 ## Project Status & Disclaimer
 
-⚠️ **Please Note:** This project is currently maintained primarily as a learning exercise. While it aims to be functional and useful for the described use cases, it's still under development. There might be bugs, rough edges, or areas for improvement. Treat it as **experimental**. Feedback, bug reports, and contributions are highly encouraged!
+⚠️ **Please Note:** This project is currently maintained primarily as a learning exercise and for personal use. While it aims to be functional and useful for the described use cases, it's still under active development. There might be bugs, rough edges, or areas for improvement. Treat it as **experimental**. Feedback, bug reports, and contributions are highly encouraged!
 
-## Core Features (v0.7.x)
+## Core Features
 
-*   🚀 **Project Initialization:** (`--init`) Quickly scaffold a new project with a default layout, example pages (using inline, conventional `.py`, and explicit `<python src="...">`), `hpy.toml` configuration, a scripts directory, and a static assets directory.
-*   ⚙️ **Project Configuration:** (`hpy.toml`) Define common settings like input source directory, output directory, and static asset directory name in a simple TOML file at the project root. CLI flags override `hpy.toml` settings.
-*   📁 **Directory-Based Workflow:** Process an entire source directory (`src/` by default, configurable via `hpy.toml`) containing your layout, page files, Python scripts, and static assets.
-*   📄 **Layout Support:** Define a global `_layout.hpy` for shared HTML structure, CSS, and Python logic. Page content is injected automatically. Layout Python runs before page Python.
-*   🧩 **Single-File Pages:** Write individual page content and logic in separate `.hpy` files within your source directory.
+*   🚀 **Project Initialization (`hpy init <dir>`):** Quickly scaffold new projects with options for:
+    *   **Full Project (default):** Includes `_app.html` (root HTML shell), `_layout.hpy`, example pages (showcasing inline, conventional `.py`, and explicit `<python src="...">`), `hpy.toml`, scripts, and static assets.
+    *   **Blank Project:** Minimal structure with `_app.html`, an empty `_layout.hpy`, and `hpy.toml`.
+    *   **Single File Project:** A self-contained `app.hpy` and basic `hpy.toml`.
+*   ⚙️ **Project Configuration (`hpy.toml`):** Define `input_dir`, `output_dir` (for production), `dev_output_dir` (for development/watch), and `static_dir_name`. CLI flags can override these.
+*   📄 **Root HTML App Shell (`_app.html`):** Defines the outermost HTML structure (`<!DOCTYPE html>`, `<html>`, `<head>`, Brython CDN links, `<body>`). Layouts/pages inject content via `<!-- HPY_HEAD_CONTENT -->` and `<!-- HPY_BODY_CONTENT -->`.
+*   📁 **Directory-Based Workflow:** Process an entire source directory (`src/` by default).
+*   📄 **Layout Support (`_layout.hpy`):** Define shared structure using `<hpy-head>` and `<hpy-body>` tags for app shell injection. Page content fills `<!-- HPY_PAGE_CONTENT -->`.
+*   🧩 **Single-File Pages (`.hpy`):** Can provide `<hpy-head>` content for the app shell if not using a layout.
 *   🐍 **Flexible Python Logic:**
-    *   Write Python directly inside `<python>...</python>` blocks in your `.hpy` files.
-    *   **Convention:** Place page logic in `page.py` alongside `page.hpy`. `hpy-tool` automatically uses it.
-    *   **Explicit:** Use `<python src="path/to/script.py">` within `page.hpy` to link any `.py` file (relative path). This overrides conventional and inline Python for that page.
-*   🖼️ **Static Asset Handling:** Automatically copies files from a designated static directory (e.g., `src/static/`) to the output directory (e.g., `dist/static/`) during builds and keeps them synced in watch mode (requires `static_dir_name` in `hpy.toml`).
-*   🐍 **Brython Integration:** Automatically includes the Brython runtime. Manages inline scripts, external script copying/linking, and helper function injection.
-*   ⚙️ **Smart Compilation:** Builds HTML files corresponding to your source `.hpy` pages, applying the layout and linking/embedding Python correctly. Copies/processes associated Python scripts.
-*   🚀 **Development Server:** (`-s`, `-p`) Instantly serves your compiled application locally from the output directory with no-cache headers.
-*   🔄 **Live Rebuilding & Syncing:** (`-w`) Automatically recompiles `.hpy` files, syncs static assets, and copies/updates associated `.py` files when source files change (requires `watchdog`). Handles dependencies between `.hpy` and `.py` files.
-*   🗣️ **Verbose Mode:** (`-v`) Provides detailed logs for build steps, script/static file operations, and server activity.
-*   💡 **DOM Helpers:** Automatically injects `byid()`, `qs()`, `qsa()` helpers into the global scope (accessible from layout, inline, and external scripts).
-*   🏗️ **Refactored Codebase:** Internal code organized into the `hpy_core` package for better maintainability.
+    *   Inline: `<python>...</python>` blocks.
+    *   Conventional: `page.py` alongside `page.hpy`.
+    *   Explicit: `<python src="path/script.py">`.
+*   🖼️ **Static Asset Handling:** Copies files from `static_dir_name` to the appropriate output directory and syncs in watch mode.
+*   🐍 **Brython Integration:** `_app.html` includes Brython. `hpy-tool` manages script processing and DOM helper injection.
+*   🌍 **Build Modes:**
+    *   **Development (e.g., `hpy watch`, `hpy build`):** Builds to `dev_output_dir` (or `.hpy_dev_output/`). Includes Brython debug and live-reload scripts (for `watch`).
+    *   **Production (`hpy build --production`):** Builds to `output_dir` (or `dist/`). Brython debug off, no live-reload scripts.
+*   🚀 **Development Server (`hpy serve`, `hpy watch`):** Serves the compiled application locally.
+*   🔄 **Live Rebuilding & Reloading (`hpy watch`):** Uses `watchfiles` to monitor changes, rebuilds, syncs assets, and triggers browser live reload.
+*   🗣️ **Verbose Mode (`-v` global flag):** Detailed operational logs.
+*   💡 **DOM Helpers:** `byid()`, `qs()`, `qsa()` injected into Python scripts.
 
 ## Ideal For
 
-*   ⚡ Building small to medium-sized web applications or dashboards with Python in the browser, including static assets like images and CSS.
-*   🎓 Learning and experimenting with Brython in a structured project setup with configuration and flexible script organization.
-*   📦 Creating interactive documentation examples or simple UI components.
-*   ⚡ Rapid prototyping where code organization and configuration are helpful.
+*   Building small to medium web apps/dashboards with Python in the browser.
+*   Learning Brython in a structured environment.
+*   Rapid prototyping with live feedback.
 
 ## Installation
 
 A Python virtual environment is strongly recommended.
 
 ```bash
-# 1. Create and activate a virtual environment (if you haven't)
+# 1. Create and activate a virtual environment
 python -m venv .venv
-# Linux/macOS:
-source .venv/bin/activate
-# Windows (CMD):
-# .venv\Scripts\activate.bat
-# Windows (PowerShell):
-# .venv\Scripts\Activate.ps1
+# Linux/macOS: source .venv/bin/activate
+# Windows: .venv\Scripts\activate
 
 # 2. Install hpy-tool
-# Option A: From PyPI (once published)
+# Option A: From PyPI (once v1.0.0+ is published)
 # pip install hpy-tool
 
 # Option B: From local source code (for development)
 # Navigate to the directory containing pyproject.toml
 pip install -e .
 
-# Note: This installs 'watchdog' (needed for -w) and 'tomli' (for hpy.toml on Python < 3.11) automatically.
+# Dependencies: 'typer[all]', 'watchfiles', 'tomli' (for Python < 3.11).
 ```
 
 ## Getting Started: New Project
 
 1.  **Initialize a Project:**
-
     ```bash
-    hpy --init my-new-app
+    hpy init my-new-app
     cd my-new-app
     ```
-    This creates a directory-based project (default):
+    This creates a full project structure (default option when prompted):
     ```
     my-new-app/
     ├── hpy.toml        # Project configuration file
     └── src/            # Default source directory
+        ├── _app.html     # Root HTML application shell
         ├── _layout.hpy   # Shared layout file
         ├── index.hpy     # Example page (uses index.py)
-        ├── index.py      # Conventional external script
+        ├── index.py      # Conventional Python for index.hpy
         ├── about.hpy     # Example page (uses explicit src)
-        ├── scripts/      # Directory for shared/explicit scripts
-        │   └── about_logic.py # Script referenced by about.hpy
-        └── static/       # Static asset directory
-            └── logo.svg  # Example static file
+        ├── scripts/
+        │   └── about_logic.py
+        └── static/
+            └── logo.svg
     ```
-    *(Review `hpy.toml` - you may need to uncomment `static_dir_name`)*
+    *(Review `hpy.toml` to optionally set `static_dir_name` or `dev_output_dir`.)*
 
-2.  **Run the Dev Server with Watch:**
-
+2.  **Run the Dev Server with Watch & Live Reload:**
     ```bash
     # Make sure you are inside 'my-new-app' directory
-    hpy -w
+    hpy watch
     ```
-    *(No source directory argument needed! `hpy` reads `input_dir` from `hpy.toml` or uses the default "src". `-w` enables watching, building, script/static sync, and serving)*
+    *(This builds to the development output directory, starts the watcher, and serves the app with live reload. It uses settings from `hpy.toml` or defaults.)*
 
-3.  **Open your browser:** Navigate to `http://localhost:8000` (or the specified port). Explore the Home (`/`) and About (`/about.html`) pages. Check the browser console for `print` statements.
-4.  **Develop!** Edit files in the `src/` directory (`.hpy`, `.py`, static assets).
-5.  **Save:** Save your changes. The tool will automatically rebuild/sync. Refresh your browser!
+3.  **Open your browser:** Navigate to `http://localhost:8000` (or the port specified with `-p`).
+4.  **Develop!** Edit files in the `src/` directory. `hpy-tool` automatically rebuilds, and your browser live-reloads.
 
 ## Project Structure Explained
 
-*   **`hpy.toml` (Project Root):** Configuration file for `hpy-tool`. Defines input/output directories, static asset folder name, etc.
-*   **`src/` (or your configured `input_dir`):** Contains all your source `.hpy` files, associated `.py` files (conventional or in subdirectories), and the static asset directory.
-*   **`src/static/` (or your configured `static_dir_name`):** Holds static assets (CSS, JS, images, fonts). Contents are copied directly to the output directory under the same name (e.g., `dist/static/`). Requires `static_dir_name` in `hpy.toml`.
-*   **`src/_layout.hpy` (Optional but Recommended):**
-    *   Defines the main HTML structure (`<head>`, `<body>`, shared elements).
-    *   Must contain `<!-- HPY_PAGE_CONTENT -->` where page content is injected.
-    *   Can contain global `<style>` and `<python>` blocks (inline only). Layout Python runs before page Python.
-*   **`src/*.hpy` (Page Files):**
-    *   Contain specific page content (`<html>` section replaces the layout placeholder).
-    *   Can contain page-specific `<style>`.
-    *   Can optionally contain inline `<python>` *or* a `<python src="...">` tag *or* rely on a conventional `*.py` file alongside it.
-*   **`src/*.py` or `src/**/*.py` (External Python Scripts):**
-    *   **Conventional:** If `page.py` exists alongside `page.py`, it's automatically used (unless overridden by `src`).
-    *   **Explicit:** Referenced using `<python src="relative/path/to/script.py">` within an `.hpy` file. The path is relative to the `.hpy` file.
+*   **`hpy.toml` (Project Root):** Configures `input_dir`, `output_dir` (for production), `dev_output_dir`, and `static_dir_name`.
+*   **`src/` (or configured `input_dir`):**
+    *   **`_app.html`:** Root HTML. Contains `<!-- HPY_HEAD_CONTENT -->` and `<!-- HPY_BODY_CONTENT -->`. Includes Brython.
+    *   **`_layout.hpy`:** Shared layout. Uses `<hpy-head>` and `<hpy-body>`. Its `<hpy-body>` must have `<!-- HPY_PAGE_CONTENT -->`.
+    *   **`*.hpy` (Pages):** Page content. HTML part fills `LAYOUT_PLACEHOLDER`. Can provide `<hpy-head>` content.
+    *   **`static/`:** Static assets. Requires `static_dir_name` in `hpy.toml`.
+    *   **`*.py` / `scripts/`:** External Python scripts.
 
 ## `.hpy` File Structure Guide
 
-*   **`<html>...</html>`:** Contains the HTML fragment. (Required).
-*   **`<style>...</style>`:** Contains CSS rules. Multiple tags are concatenated. (Optional).
-*   **`<python>...</python>`:** Contains inline Brython (Python 3) code. Multiple tags are concatenated. (Optional). **This block is ignored if a corresponding `*.py` file exists or if `<python src="...">` is used in the same file.**
-*   **`<python src="path/script.py">`:** Specifies an external Python script file to use for this page's logic. (Optional).
-    *   The `path` is relative to the location of the `.hpy` file.
-    *   The resolved script path **must** reside within the project's input directory (e.g., `src/`) and **must not** be inside the static asset directory.
-    *   If present, this takes precedence over both conventional `*.py` files and inline `<python>` blocks.
-    *   Only the first `<python src="...">` tag found is used.
+*   **Main HTML Block:** The primary HTML fragment for the page body or layout body.
+    *   In pages, this is typically an `<html>...</html>` fragment (the content between `<html>` tags).
+    *   In `_layout.hpy` used with `_app.html`, this content is within the `<hpy-body>` tag.
+*   **`<hpy-head>...</hpy-head>` (Optional):** Content injected into `_app.html`'s `<head>`. For `<title>`, `<meta>`, layout/page-specific `<style>`.
+*   **`<hpy-body>...</hpy-body>` (In `_layout.hpy` for app shell):** Defines layout's body structure for `_app.html`.
+*   **`<style>...</style>`:** CSS rules. Combined globally.
+*   **`<python>...</python>`:** Inline Brython. Ignored if `src` or conventional `.py` is used.
+*   **`<python src="path/script.py">`:** Links external Python script. Path relative to `.hpy` file.
 
-**Important Notes:**
-*   Ensure Python code inside `<python>` or `.py` files starts with no leading indentation (unless within functions/classes).
-*   The layout file must contain `<!-- HPY_PAGE_CONTENT -->`.
-*   CSS from layout/pages is combined globally.
-*   Python helpers (`byid`, `qs`, `qsa`) are injected globally and available in layout, inline, and external scripts. Layout Python runs first, then the page script (inline or external).
-*   Static asset handling requires `static_dir_name` to be set (uncommented) in `hpy.toml`.
+## Command-Line Interface (CLI)
 
-### Simplified DOM Access
-
-These helpers are automatically available globally:
-
-*   `byid(id)`: Returns element or `None`.
-*   `qs(selector)`: Returns first matching element or `None`.
-*   `qsa(selector)`: Returns a list of matching elements.
-
-## Command-Line Usage
+`hpy-tool` uses a modern, subcommand-based interface.
 
 ```
-usage: hpy [-h] [--init PROJECT_DIR] [-o DIR] [-v] [-s] [-p PORT] [-w] [--version] [SOURCE]
+$ hpy --help
+Usage: hpy [OPTIONS] COMMAND [ARGS]...
 
-HPY Tool: Compile/serve .hpy projects. Configurable via hpy.toml.
+  HPY Tool: Build, serve, and watch .hpy projects with Brython.
 
-# ... (rest of CLI help remains the same as previous version) ...
+Options:
+  -v, --verbose  Enable detailed verbose output globally.
+  --version      Show version and exit.
+  --help         Show this message and exit.
 
-Examples:
-  hpy --init my_app          # Initialize project 'my_app' (creates hpy.toml, src/, scripts/, static/)
-  hpy                        # Compile project (uses settings from hpy.toml or defaults 'src' -> 'dist')
-  hpy -o build               # Compile project, overriding output dir to 'build'
-  hpy app_source -o public   # Compile specific input dir, overriding output dir
-  hpy page.hpy -o build      # Compile single file (no layout/static/external script handling) to build/page.html
-  hpy -w                     # Watch (src -> dist via hpy.toml/defaults), build, sync static/scripts, and serve
-  hpy -w -p 8080             # Watch and serve on port 8080
-  hpy src/app.hpy -w         # Watch single file (layout/static/external script NOT automatically used)
-
-Configuration (hpy.toml in project root):
-  [tool.hpy]
-  input_dir = "src"      # Default: "src"
-  output_dir = "dist"    # Default: "dist"
-  static_dir_name = "static" # Default: "static" (Must be set to enable static handling)
-
-Precedence: CLI Arguments > hpy.toml Settings > Built-in Defaults
+Commands:
+  build  Compile an HPY project or single file.
+  init   Initialize a new HPY project.
+  serve  Build (optional) and serve an HPY project.
+  watch  Watch project, rebuild on changes, and serve.```
 ```
+**Common Commands:**
+
+*   **`hpy init <project-name>`:** Creates a new project.
+    *   Prompts for project type (Full, Blank, Single File).
+*   **`hpy build [source_path]`:** Compiles the project.
+    *   Defaults to `input_dir` from `hpy.toml` or `src/`.
+    *   Outputs to development output directory (e.g., `.hpy_dev_output/` or configured `dev_output_dir`).
+    *   `--production`: Builds for production to `output_dir` (e.g., `dist/`) with optimizations.
+    *   `-o, --output <dir>`: Specifies a custom output directory.
+*   **`hpy watch [source_path]`:** Builds in development mode, watches for changes, rebuilds, and serves.
+    *   `-o, --output <dir>`: Specifies output directory for this session.
+    *   `-p, --port <number>`: Sets the server port (default: 8000).
+*   **`hpy serve [source_path_for_build]`:** Builds in development mode (unless `--no-build`) and serves.
+    *   `-o, --output <dir>`: Specifies output directory.
+    *   `-p, --port <number>`: Sets the server port.
+    *   `--no-build`: Serves directly from the specified output directory.
+
+*(Some old-style flags like `hpy --init ...` are temporarily supported with deprecation warnings).*
 
 ## How it Works
 
-When processing a directory, `hpy-tool` first checks `hpy.toml` for configuration. It then copies static assets (if configured). It parses the layout (if present). For each page file (`.hpy` outside static dir), it parses the file to determine its Python source:
-1. Checks for `<python src="path/script.py">`. If valid, resolves the path.
-2. If no valid `src`, checks for a conventional `page.py` alongside `page.hpy`.
-3. If neither external source is found, uses inline `<python>` content from the `.hpy`.
+`hpy-tool` first reads `hpy.toml` for project configuration.
+When building:
+1.  It identifies the `input_dir` and the target `output_dir` (which differs for dev/watch vs. production builds).
+2.  Static assets are copied (if `static_dir_name` is configured).
+3.  If `_app.html` exists in `input_dir`, it's used as the base HTML shell.
+4.  If `_layout.hpy` exists, it's parsed. Its `<hpy-head>` content and processed `<hpy-body>` (with page content injected into `LAYOUT_PLACEHOLDER`) are prepared for insertion into `_app.html`.
+5.  For each page `.hpy` file:
+    *   It's parsed for its HTML body fragment, optional `<hpy-head>` content, styles, and Python source (inline, conventional, or explicit `src`).
+    *   External Python scripts are processed (helpers injected) and placed in the output directory.
+    *   Styles are collected.
+    *   The final HTML is assembled: page content goes into the layout (if used), then the combined layout/page structure goes into `_app.html` (if used). If no app shell, a full HTML document is generated based on layout/page.
+    *   Titles are prioritized: Page `<hpy-head>` > Layout `<hpy-head>` > `_app.html` default.
+6.  The `hpy watch` command uses `watchfiles` to monitor source files and triggers rebuilds or asset synchronization, along with browser live reloading.
 
-It then copies and injects helpers into the determined external `.py` script (if applicable), calculates the relative path for the HTML `<script>` tag, combines CSS, merges page HTML into the layout, and generates the final output HTML file. The watcher monitors the source directory (including static, `.hpy`, and relevant `.py` files) and triggers rebuilds or file synchronization, respecting the dependencies between `.hpy` and `.py` files.
-
-## Contributing & Development Notes
+## Contributing
 
 This project uses standard Python tooling (`setuptools`, `venv`).
 
@@ -192,7 +186,6 @@ This project uses standard Python tooling (`setuptools`, `venv`).
 *   **Pull Requests:** Contributions are welcome! Please discuss larger changes in an issue first. Ensure code is formatted reasonably and includes necessary explanations.
 
 Remember the project status disclaimer - your contributions can help improve it significantly!
-
 ## License
 
-This project is licensed under the **BSD 3-Clause "New" or "Revised" License**. See the `LICENSE` file for details.
+This project is licensed under the **BSD 3-Clause License**. See the `LICENSE` file for details.
