@@ -8,14 +8,14 @@ import shutil
 import os
 import re
 from pathlib import Path
-from typing import Dict, Optional, List, Tuple, Any
+from typing import Dict, Optional, List, Tuple, Any, Set
 
 from .config import (
     BRYTHON_VERSION, LAYOUT_FILENAME, LAYOUT_PLACEHOLDER, __version__ as hpy_tool_version,
     find_project_root, load_config,
     APP_SHELL_FILENAME, APP_SHELL_HEAD_PLACEHOLDER, APP_SHELL_BODY_PLACEHOLDER
 )
-from .parsing import parse_hpy_file
+from .parsing import parse_hpy_file, CSS_HREF_REGEX
 
 HELPER_FUNCTION_CODE = textwrap.dedent("""
     # --- HPY Tool Helper Functions (Injected) ---
@@ -120,6 +120,7 @@ def build_output_html(
     page_head_fragment: str,
     page_body_fragment: str,
     combined_style_content: str,
+    final_css_links_for_html: List[str],
     layout_python_script_tag: Optional[str],
     page_python_script_tag: Optional[str],
     output_file_path_str: str,
@@ -135,7 +136,10 @@ def build_output_html(
     final_html_output = ""
 
     final_page_title = _extract_title_from_head_content(page_head_fragment)
-    default_app_shell_title = "HPY Application" 
+    default_app_shell_title = "HPY Application"
+
+    css_link_tags = [f'<link rel="stylesheet" href="{href}">' for href in final_css_links_for_html]
+    final_css_links_str = "\n    ".join(css_link_tags) if css_link_tags else ""
 
     if app_shell_template:
         if verbose_build_output_html: print(f"DEBUG_BUILDING: Using App Shell for '{output_file_path.name}'")
@@ -149,7 +153,8 @@ def build_output_html(
 
         temp_html = re.sub(r"brython\s*\(\s*{[^}]*'debug'\s*:\s*\d+\s*[^}]*}\s*\)", f"brython({{'debug': {brython_debug_level}}})", temp_html, flags=re.IGNORECASE)
         
-        temp_html = temp_html.replace(APP_SHELL_HEAD_PLACEHOLDER, page_head_fragment.strip())
+        head_injection_content = (final_css_links_str + "\n    " + page_head_fragment.strip()).strip()
+        temp_html = temp_html.replace(APP_SHELL_HEAD_PLACEHOLDER, head_injection_content)
         temp_html = temp_html.replace(APP_SHELL_BODY_PLACEHOLDER, page_body_fragment)
         
         scripts_to_inject = f"\n{layout_python_script_tag or ''}\n{page_python_script_tag or ''}\n{live_reload_injection}\n"
@@ -170,6 +175,7 @@ def build_output_html(
     <title>{title_to_use}</title>
     <script src="https://cdn.jsdelivr.net/npm/brython@{BRYTHON_VERSION}/brython.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/brython@{BRYTHON_VERSION}/brython_stdlib.js"></script>
+    {final_css_links_str}
     <style id='_hpy_combined_styles_fallback'>
 {combined_style_content.strip()}
     </style>
@@ -196,7 +202,9 @@ def compile_hpy_file(
     output_file_path_str: str,
     app_shell_template: Optional[str],
     layout_parsed_data: Optional[Dict[str, Any]],
+    page_parsed_data: Dict[str, Any],
     external_script_src: Optional[str],
+    final_css_links_for_html: List[str],
     verbose: bool = False,
     is_dev_watch_mode: bool = False,
     is_production_build: bool = False
@@ -204,12 +212,11 @@ def compile_hpy_file(
     input_file_path = Path(input_file_path_str)
     if verbose: print(f"Processing {input_file_path.name} -> {Path(output_file_path_str).name}...")
     try:
-        page_parsed_data = parse_hpy_file(str(input_file_path), is_layout=False, verbose=verbose)
         page_html_body_fragment = page_parsed_data['html']
         page_head_direct_content = page_parsed_data.get('head_content', "") or ""
         page_style_content = page_parsed_data['style'] or ""
         page_python_inline = page_parsed_data['python'] if not external_script_src else None
-        
+
         final_head_content_for_injection = ""
         final_body_content_for_injection = ""
         final_combined_styles = ""
@@ -244,6 +251,11 @@ def compile_hpy_file(
                 needs_global_helpers = False
             final_page_python_script_tag = f'<script type="text/python" id="_hpy_page_script_inline">\n# --- Page Python ---\n{code_to_embed}\n# --- End Page Python ---\n</script>'
         
+        if layout_head_content:
+            layout_head_content = CSS_HREF_REGEX.sub('', layout_head_content)
+        if page_head_direct_content:
+            page_head_direct_content = CSS_HREF_REGEX.sub('', page_head_direct_content)
+
         if layout_parsed_data: 
             if LAYOUT_PLACEHOLDER not in layout_body_template:
                 raise ValueError(f"Layout file '{LAYOUT_FILENAME}' is missing placeholder '{LAYOUT_PLACEHOLDER}'.")
@@ -264,6 +276,7 @@ def compile_hpy_file(
             page_head_fragment=final_head_content_for_injection.strip(),
             page_body_fragment=final_body_content_for_injection.strip(),
             combined_style_content=final_combined_styles,
+            final_css_links_for_html=final_css_links_for_html,
             layout_python_script_tag=final_layout_python_script_tag,
             page_python_script_tag=final_page_python_script_tag,
             output_file_path_str=output_file_path_str,
@@ -347,18 +360,16 @@ def compile_directory(
             layout_parsed_data = parse_hpy_file(str(layout_file_path), is_layout=True, verbose=verbose)
             print(f"Using layout file: {LAYOUT_FILENAME}")
         except Exception as e:
-            # --- CORRECTED SYNTAX HERE ---
             print(f"Error parsing layout file {LAYOUT_FILENAME}: {e}", file=sys.stderr)
-            if verbose: 
-                traceback.print_exc()
+            if verbose: traceback.print_exc()
             raise RuntimeError(f"Layout file parsing failed: {e}") from e
-            # --- END CORRECTION ---
     elif verbose: print(f"No layout file '{LAYOUT_FILENAME}' found.")
 
     compiled_files: List[str] = []
     failed_files: List[str] = []
     files_processed = 0
     processed_py_scripts: Set[Path] = set() 
+    processed_css_files: Set[Path] = set()
     hpy_files_found = [p for p in input_dir.glob('**/*.hpy') if p.name != LAYOUT_FILENAME and p.name != APP_SHELL_FILENAME]
     static_dir_name = config.get("static_dir_name")
     source_static_dir: Optional[Path] = None
@@ -370,25 +381,32 @@ def compile_directory(
     if verbose and hpy_files_found: print(f"Compiling {len(hpy_files_found)} page file(s)...")
     
     py_files_processed_count = 0
+    css_files_processed_count = 0
     for hpy_file in hpy_files_found:
         files_processed += 1
-        external_script_src_for_html: Optional[str] = None
-        source_py_to_copy: Optional[Path] = None
-        output_py_path: Optional[Path] = None
         try:
-            page_initial_parse = parse_hpy_file(str(hpy_file), is_layout=False, verbose=False)
-            explicit_src_from_page = page_initial_parse.get('script_src')
+            page_parsed_data = parse_hpy_file(str(hpy_file), is_layout=False, verbose=verbose)
             relative_hpy_path = hpy_file.relative_to(input_dir)
             output_html_path = output_dir / relative_hpy_path.with_suffix('.html')
 
+            # --- Process and copy linked Python script for this page ---
+            external_script_src_for_html: Optional[str] = None
+            explicit_src_from_page = page_parsed_data.get('script_src')
             if explicit_src_from_page:
                 potential_src_py = (hpy_file.parent / explicit_src_from_page).resolve()
                 if not potential_src_py.is_file(): raise FileNotFoundError(f"Script '{explicit_src_from_page}' in '{hpy_file.name}' not found at '{potential_src_py}'")
                 try: potential_src_py.relative_to(input_dir)
                 except ValueError: raise ValueError(f"Script '{explicit_src_from_page}' in '{hpy_file.name}' outside input dir '{input_dir}'.")
                 if source_static_dir and source_static_dir.exists() and potential_src_py.is_relative_to(source_static_dir): raise ValueError(f"Script '{explicit_src_from_page}' in '{hpy_file.name}' is in static dir '{source_static_dir}'.")
-                source_py_to_copy = potential_src_py
-                relative_py_path_from_input = source_py_to_copy.relative_to(input_dir)
+                
+                if potential_src_py not in processed_py_scripts:
+                    relative_py_path_from_input = potential_src_py.relative_to(input_dir)
+                    output_py_path = (output_dir / relative_py_path_from_input).resolve()
+                    copy_and_inject_py_script(potential_src_py, output_py_path, verbose)
+                    processed_py_scripts.add(potential_src_py)
+                    py_files_processed_count += 1
+                
+                relative_py_path_from_input = potential_src_py.relative_to(input_dir)
                 output_py_path = (output_dir / relative_py_path_from_input).resolve()
                 external_script_src_for_html = os.path.relpath(output_py_path, start=output_html_path.parent)
             else:
@@ -396,18 +414,51 @@ def compile_directory(
                 if conventional_py_file.exists():
                      resolved_conv_py = conventional_py_file.resolve()
                      if not (source_static_dir and source_static_dir.exists() and resolved_conv_py.is_relative_to(source_static_dir)):
-                          source_py_to_copy = resolved_conv_py
-                          output_py_path = (output_dir / relative_hpy_path).with_suffix('.py').resolve()
-                          external_script_src_for_html = output_py_path.name 
-            if source_py_to_copy and output_py_path:
-                if source_py_to_copy not in processed_py_scripts:
-                    copy_and_inject_py_script(source_py_to_copy, output_py_path, verbose)
-                    processed_py_scripts.add(source_py_to_copy)
-                    py_files_processed_count += 1
+                          if resolved_conv_py not in processed_py_scripts:
+                              output_py_path = (output_dir / relative_hpy_path).with_suffix('.py').resolve()
+                              copy_and_inject_py_script(resolved_conv_py, output_py_path, verbose)
+                              processed_py_scripts.add(resolved_conv_py)
+                              py_files_processed_count += 1
+                          external_script_src_for_html = Path(relative_hpy_path.name).with_suffix('.py').name
             
+            # --- Process and copy linked CSS files for this page ---
+            page_css_hrefs = page_parsed_data.get('css_links', [])
+            layout_css_hrefs = layout_parsed_data.get('css_links', []) if layout_parsed_data else []
+            all_css_sources_for_page = []
+            if layout_css_hrefs: all_css_sources_for_page.extend([(href, layout_file_path.parent) for href in layout_css_hrefs])
+            if page_css_hrefs: all_css_sources_for_page.extend([(href, hpy_file.parent) for href in page_css_hrefs])
+            
+            final_css_links_for_html: List[str] = []
+            unique_css_sources_on_page: Set[Path] = set()
+
+            for href, base_path in all_css_sources_for_page:
+                source_css_file = (base_path / href).resolve()
+                if source_css_file in unique_css_sources_on_page: continue
+                unique_css_sources_on_page.add(source_css_file)
+
+                if not source_css_file.is_file(): raise FileNotFoundError(f"CSS file '{href}' linked in '{base_path.name}' not found at '{source_css_file}'")
+                try: source_css_file.relative_to(input_dir)
+                except ValueError: raise ValueError(f"CSS file '{href}' in '{base_path.name}' is outside input dir '{input_dir}'.")
+                if source_static_dir and source_static_dir.exists() and source_css_file.is_relative_to(source_static_dir): raise ValueError(f"CSS file '{href}' in '{base_path.name}' is in static dir '{source_static_dir}'.")
+
+                relative_css_path = source_css_file.relative_to(input_dir)
+                output_css_path = (output_dir / relative_css_path).resolve()
+
+                if source_css_file not in processed_css_files:
+                    output_css_path.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(source_css_file, output_css_path)
+                    if verbose: print(f"  Copied linked asset: {source_css_file.name} -> {output_css_path.relative_to(output_dir)}")
+                    processed_css_files.add(source_css_file)
+                    css_files_processed_count += 1
+                
+                html_href = os.path.relpath(output_css_path, start=output_html_path.parent).replace(os.sep, '/')
+                final_css_links_for_html.append(html_href)
+
+            # --- Compile the final HTML ---
             compile_hpy_file(
                 str(hpy_file), str(output_html_path), app_shell_template_content, layout_parsed_data,
-                external_script_src_for_html, verbose, is_dev_watch_mode, is_production_build
+                page_parsed_data, external_script_src_for_html, final_css_links_for_html,
+                verbose, is_dev_watch_mode, is_production_build
             )
             compiled_files.append(str(output_html_path))
         except Exception as e:
@@ -415,11 +466,12 @@ def compile_directory(
             if verbose: traceback.print_exc()
             failed_files.append(f"{hpy_file.name} ({type(e).__name__})")
 
-    if verbose or files_processed > 0 or py_files_processed_count > 0 or (static_dir_name and source_static_dir and source_static_dir.exists()):
+    if verbose or files_processed > 0 or py_files_processed_count > 0 or css_files_processed_count > 0 or (static_dir_name and source_static_dir and source_static_dir.exists()):
         print(f"\n--- Build Summary ---")
         print(f"Mode: {'Production' if is_production_build else 'Development'}")
         print(f"Processed: {files_processed} page file(s).")
         if processed_py_scripts: print(f"External Python scripts processed: {py_files_processed_count}")
+        if processed_css_files: print(f"Linked CSS assets processed: {css_files_processed_count}")
         if static_dir_name and source_static_dir and source_static_dir.exists(): print(f"Static assets handled from: '{static_dir_name}'")
         elif static_dir_name: print(f"Static asset directory '{static_dir_name}' configured but not found in source '{input_dir / static_dir_name}'.")
         if not failed_files: print(f"Status: SUCCESS")

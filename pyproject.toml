@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hpy-tool"
 # Sync version with hpy_core/config.py
-version = "0.7.3" # Updated Version for App Shell + Init Refactor
+version = "0.8.1" # Updated Version for App Shell + Init Refactor
 authors = [
   { name="xdmanus", email="xdmanus.dev@gmail.com" },
 ]
