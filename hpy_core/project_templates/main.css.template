@@ -1,60 +1,82 @@
-/* hpy_core/project_templates/main.css.template */
-/* This is a sample main CSS file for HPY projects */
+/* src/main.css */
+/* Global styles for the application */
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f4f4f4;
+    --text-color: #333;
+    --card-background: #ffffff;
+    --header-background: #343a40;
+    --header-text: #ffffff;
+    --link-color: #0056b3;
+}
 
 body {
-    font-family: var(--hpy-font-family, sans-serif);
-    color: var(--hpy-text-color, #333);
-    background-color: var(--hpy-background-color, #fff);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
-/* Example of using variables that could be defined in _layout.hpy or _app.html <style> */
-:root {
-    --hpy-primary-color: #007bff;
-    --hpy-secondary-color: #6c757d;
-    --hpy-font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --hpy-text-color: #212529;
-    --hpy-background-color: #f8f9fa;
-    --hpy-link-color: #007bff;
-    --hpy-link-hover-color: #0056b3;
+.app-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: var(--card-background);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
 }
 
-a {
-    color: var(--hpy-link-color);
+header.main-header {
+    background: var(--header-background);
+    color: var(--header-text);
+    padding: 1rem 0;
+    text-align: center;
+    margin-bottom: 1rem;
+    border-radius: 5px 5px 0 0;
+}
+
+header.main-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+nav.main-nav ul {
+    padding: 0;
+    list-style: none;
+    text-align: center;
+    margin: 0;
+}
+
+nav.main-nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav.main-nav a {
+    color: var(--header-text);
     text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s ease-in-out;
 }
 
-a:hover {
-    color: var(--hpy-link-hover-color);
-    text-decoration: underline;
+nav.main-nav a:hover {
+    color: var(--primary-color);
 }
 
-/* Add some basic styling for common elements if desired */
-h1, h2, h3 {
-    color: var(--hpy-primary-color);
-    margin-bottom: 0.5em;
+main.content-area {
+    padding: 1rem 0;
 }
 
-button, .button {
-    background-color: var(--hpy-primary-color);
-    color: white;
-    padding: 0.5em 1em;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    font-size: 1em;
-}
-
-button:hover, .button:hover {
-    background-color: var(--hpy-link-hover-color);
-}
-
-.container {
-    max-width: 960px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 15px;
-    padding-right: 15px;
+footer.main-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--header-background);
+    color: var(--header-text);
+    font-size: 0.9rem;
+    border-radius: 0 0 5px 5px;
 }

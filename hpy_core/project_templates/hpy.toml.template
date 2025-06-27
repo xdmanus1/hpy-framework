@@ -4,26 +4,21 @@
 [tool.hpy]
 
 # Source directory containing your .hpy files, _app.html (if used),
-# _layout.hpy (if used), and static assets.
+# _layout.hpy (if used), and other assets.
 input_dir = "{DEFAULT_INPUT_DIR}"
 
 # Default output directory, primarily used for 'hpy build --production'.
-# Also used as a fallback for development builds if 'dev_output_dir' is not set
-# and no specific output is given via CLI -o.
 output_dir = "{DEFAULT_OUTPUT_DIR}"
 
-# Optional: Output directory for development builds (e.g., from 'hpy watch', 
-# 'hpy serve', or 'hpy build' without --production).
-# If set, this directory will be used for these development-centric commands,
-# keeping your main 'output_dir' (e.g., 'dist/') clean for production artifacts.
-# If not set here, development builds will default to a directory named 
-# '{DEFAULT_DEV_OUTPUT_DIR_NAME}' created in your project root (or current directory).
-# The -o flag on CLI commands can override these settings.
-# Example:
+# Optional: Output directory for development builds (e.g., from 'hpy watch').
+# If not set, development builds will default to a directory named 
+# '{DEFAULT_DEV_OUTPUT_DIR_NAME}' in your project root.
 # dev_output_dir = ".hpy_development_build"
 
-# Name of the directory within 'input_dir' for static assets
-# (e.g., "static", "public", "assets").
-# Files in this directory will be copied directly to the relevant output directory.
-# To enable, uncomment and set the name. Example:
+# Optional: Name of the directory within 'input_dir' for static assets.
+# To enable, uncomment and set the name.
 # static_dir_name = "{DEFAULT_STATIC_DIR_NAME}"
+
+# Optional: Name of the directory within 'input_dir' for reusable components.
+# To enable, uncomment and set the name. Defaults to "components".
+# components_dir = "components"

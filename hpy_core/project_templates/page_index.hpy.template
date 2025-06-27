@@ -3,6 +3,12 @@
         <h2>Home Page</h2>
         <p>This is the main content area for the home page, defined in <code>index.hpy</code>.</p>
         <p>It uses the common layout defined in <code>_layout.hpy</code>, which is then placed into <code>_app.html</code>.</p>
+        
+        <hr>
+        <h3>Component Demo:</h3>
+        <Card title="Reusable Welcome Card" content="This is a reusable component, defined in src/components/Card.hpy and used here in index.hpy. The title and content are passed as props." />
+        <hr>
+
         <button id="index-button">Click Me (Index Page)</button>
         <div id="index-output" style="margin-top: 10px; border: 1px solid #ccc; padding: 10px; min-height: 30px;"></div>
     </div>

@@ -1,0 +1,28 @@
+<!-- src/components/Card.hpy -->
+<div class="component-card">
+    <h3 class="card-title">{props.title}</h3>
+    <div class="card-content">
+        <slot />
+    </div>
+</div>
+
+<style>
+    .component-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        background-color: #fafafa;
+    }
+    .card-title {
+        margin-top: 0;
+        color: #333;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 8px;
+    }
+    .card-content {
+        color: #555;
+        line-height: 1.5;
+    }
+</style>

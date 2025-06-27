@@ -14,13 +14,14 @@ except ImportError:
         print("Please install it: pip install tomli", file=sys.stderr)
         sys.exit(1)
 
-__version__ = "0.8.1" # Version bump for Dev Output Dir feature
+__version__ = "0.8.2" # Version bump for Component System Foundations
 
 # --- Default Configuration Values ---
 DEFAULT_INPUT_DIR = "src"
-DEFAULT_OUTPUT_DIR = "dist" # Primary output for production builds
-DEFAULT_DEV_OUTPUT_DIR_NAME = ".hpy_dev_output" # Default for dev/watch builds if not specified in config
+DEFAULT_OUTPUT_DIR = "dist"
+DEFAULT_DEV_OUTPUT_DIR_NAME = ".hpy_dev_output"
 DEFAULT_STATIC_DIR_NAME = "static"
+DEFAULT_COMPONENTS_DIR = "components" # NEW
 CONFIG_FILENAME = "hpy.toml"
 
 # --- Core Constants ---
@@ -63,9 +64,11 @@ def load_config(project_root: Optional[Path]) -> Dict[str, Any]:
                 config["output_dir"] = hpy_config["output_dir"]
             if isinstance(hpy_config.get("static_dir_name"), str):
                 config["static_dir_name"] = hpy_config["static_dir_name"]
-            # --- NEW: Load dev_output_dir ---
             if isinstance(hpy_config.get("dev_output_dir"), str):
                 config["dev_output_dir"] = hpy_config["dev_output_dir"]
+            # --- NEW: Load components_dir ---
+            if isinstance(hpy_config.get("components_dir"), str):
+                config["components_dir"] = hpy_config["components_dir"]
             # --- END NEW ---
             
             return config

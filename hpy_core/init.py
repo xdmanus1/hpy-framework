@@ -10,7 +10,7 @@ from typing import Optional
 from .config import (
     LAYOUT_FILENAME, BRYTHON_VERSION, LAYOUT_PLACEHOLDER,
     CONFIG_FILENAME, DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR,
-    DEFAULT_STATIC_DIR_NAME,
+    DEFAULT_STATIC_DIR_NAME, DEFAULT_COMPONENTS_DIR,
     APP_SHELL_FILENAME, APP_SHELL_HEAD_PLACEHOLDER, APP_SHELL_BODY_PLACEHOLDER
 )
 
@@ -29,6 +29,8 @@ def _load_template(filename: str, **kwargs) -> str:
             "DEFAULT_INPUT_DIR": DEFAULT_INPUT_DIR,
             "DEFAULT_OUTPUT_DIR": DEFAULT_OUTPUT_DIR,
             "DEFAULT_STATIC_DIR_NAME": DEFAULT_STATIC_DIR_NAME,
+            "DEFAULT_DEV_OUTPUT_DIR_NAME": ".hpy_dev_output",
+            "DEFAULT_COMPONENTS_DIR": DEFAULT_COMPONENTS_DIR,
             "APP_SHELL_FILENAME": APP_SHELL_FILENAME,
             "APP_SHELL_HEAD_PLACEHOLDER": APP_SHELL_HEAD_PLACEHOLDER,
             "APP_SHELL_BODY_PLACEHOLDER": APP_SHELL_BODY_PLACEHOLDER,
@@ -36,10 +38,8 @@ def _load_template(filename: str, **kwargs) -> str:
             "LAYOUT_FILENAME": LAYOUT_FILENAME,
             "CURRENT_YEAR": time.strftime('%Y'),
         }
-        # Update with any explicitly passed kwargs, allowing override
         known_placeholders.update(kwargs)
 
-        # Selectively replace known placeholders
         for key, value in known_placeholders.items():
             placeholder_tag = "{" + key + "}" 
             content = content.replace(placeholder_tag, str(value))
@@ -71,40 +71,19 @@ def _read_raw_template(filename: str) -> str:
 
 # --- Template Getter Functions ---
 
-def _get_app_shell_template() -> str:
-    return _load_template("app_shell.html.template")
-
-def _get_modified_layout_template() -> str:
-    return _load_template("layout_for_shell.hpy.template")
-
-def _get_layout_index_template() -> str:
-    return _load_template("page_index.hpy.template")
-
-def _get_layout_about_template() -> str:
-    return _load_template("page_about.hpy.template")
-
-def _get_single_file_template() -> str:
-    # This template contains {BRYTHON_VERSION} which needs replacement,
-    # but its Python f-strings should be preserved by _load_template's selective replacement.
-    return _load_template("single_file_app.hpy.template")
-
-def _get_hpy_toml_template() -> str: # For full/blank projects
-    return _load_template("hpy.toml.template")
-
-def _get_hpy_toml_for_single_file() -> str: # For single file projects
-    return _load_template("hpy_single_file.toml.template")
-
-def _get_logo_svg_template() -> str:
-    return _read_raw_template("logo.svg.template") # SVG is raw content
-
-def _get_layout_index_py_template() -> str:
-    return _read_raw_template("script_index.py.template")
-
-def _get_layout_about_py_template() -> str:
-    return _read_raw_template("script_about.py.template")
-
-def _get_blank_layout_template() -> str:
-    return _load_template("blank_layout_for_shell.hpy.template")
+def _get_app_shell_template() -> str: return _load_template("app_shell.html.template")
+def _get_modified_layout_template() -> str: return _load_template("layout_for_shell.hpy.template")
+def _get_layout_index_template() -> str: return _load_template("page_index.hpy.template")
+def _get_layout_about_template() -> str: return _load_template("page_about.hpy.template")
+def _get_single_file_template() -> str: return _load_template("single_file_app.hpy.template")
+def _get_hpy_toml_template() -> str: return _load_template("hpy.toml.template")
+def _get_hpy_toml_for_single_file() -> str: return _load_template("hpy_single_file.toml.template")
+def _get_logo_svg_template() -> str: return _read_raw_template("logo.svg.template")
+def _get_layout_index_py_template() -> str: return _read_raw_template("script_index.py.template")
+def _get_layout_about_py_template() -> str: return _read_raw_template("script_about.py.template")
+def _get_blank_layout_template() -> str: return _load_template("blank_layout_for_shell.hpy.template")
+def _get_component_card_template() -> str: return _read_raw_template("component_card.hpy.template")
+def _get_main_css_template() -> str: return _read_raw_template("main.css.template") # NEW
 
 
 # --- Core Project Creation Logic ---
@@ -164,9 +143,12 @@ def _create_layout_project(project_path: Path, blank: bool = False):
                 f.write(_get_modified_layout_template())
         
         static_dir_path = src_dir_path / DEFAULT_STATIC_DIR_NAME
-        static_dir_path.mkdir(exist_ok=True) # Create static dir for all layout projects
+        static_dir_path.mkdir(exist_ok=True)
 
         if not blank:
+            # Create main.css stylesheet
+            with open(src_dir_path / "main.css", "w", encoding="utf-8") as f: f.write(_get_main_css_template())
+
             index_hpy_path = src_dir_path / "index.hpy"
             index_py_path = src_dir_path / "index.py"
             with open(index_hpy_path, "w", encoding="utf-8") as f: f.write(_get_layout_index_template())
@@ -182,6 +164,10 @@ def _create_layout_project(project_path: Path, blank: bool = False):
             logo_path = static_dir_path / "logo.svg"
             with open(logo_path, "w", encoding="utf-8") as f: f.write(_get_logo_svg_template())
 
+            components_dir_path = src_dir_path / DEFAULT_COMPONENTS_DIR
+            components_dir_path.mkdir(exist_ok=True)
+            with open(components_dir_path / "Card.hpy", "w", encoding="utf-8") as f: f.write(_get_component_card_template())
+
     except Exception as e:
         print(f"Error creating layout project at '{project_path}': {e}", file=sys.stderr)
         if isinstance(e, (OSError, IOError)):
@@ -189,29 +175,31 @@ def _create_layout_project(project_path: Path, blank: bool = False):
         sys.exit(1)
 
     if blank:
-        print(f"\n✓ Blank HPY project with App Shell initialized in '{project_path}'.")
+        print(f"\n✓ Blank HPY project initialized in '{project_path}'.")
     else:
-        print(f"\n✓ Directory-based HPY project with App Shell initialized in '{project_path}'.")
+        print(f"\n✓ Full HPY project with Component Demo initialized in '{project_path}'.")
 
     print("Created:")
     if hpy_toml_path: print(f"  - {hpy_toml_path.relative_to(project_path)}")
     print(f"  - {src_dir_path.relative_to(project_path)}/")
     print(f"    - {APP_SHELL_FILENAME}")
-    print(f"    - {LAYOUT_FILENAME}")
-    print(f"    - {static_dir_path.relative_to(src_dir_path).name}/")
-
+    print(f"    - {LAYOUT_FILENAME} (links to main.css)") # MODIFIED
+    
     if not blank:
-        print(f"    - index.hpy")
+        print(f"    - main.css") # NEW
+        print(f"    - {DEFAULT_COMPONENTS_DIR}/Card.hpy")
+        print(f"    - index.hpy (uses the Card component)")
         print(f"    - index.py")
         print(f"    - about.hpy")
         print(f"    - scripts/about_logic.py")
-        print(f"      - logo.svg (inside {static_dir_path.relative_to(src_dir_path).name})")
+        print(f"    - {static_dir_path.relative_to(src_dir_path).name}/logo.svg")
     else:
-        print(f"    (Minimal content - add your pages to '{src_dir_path.name}')")
+        print(f"    - {static_dir_path.relative_to(src_dir_path).name}/")
+        print(f"    (Minimal content - add your pages and components to '{src_dir_path.name}')")
     
     print("\nTo get started:")
     print(f"  cd {project_path.name}")
-    print(f"  # Edit hpy.toml to enable static assets by uncommenting 'static_dir_name'.")
+    print(f"  # Edit hpy.toml to configure static assets and components directories.")
     print(f"  hpy watch")
 
 
@@ -223,9 +211,9 @@ def init_project(project_dir_str: str):
          print(f"Error: '{project_dir_str}' exists and is not a directory.", file=sys.stderr); sys.exit(1)
     
     print("Choose a project template:")
-    print("  1: Simple Single File (app.hpy + hpy.toml - generates full HTML)")
-    print(f"  2: Full Project (App Shell, Layout, Examples - '{DEFAULT_INPUT_DIR}/{APP_SHELL_FILENAME}', etc.)")
-    print(f"  3: Blank Project (App Shell, Minimal Layout - '{DEFAULT_INPUT_DIR}/{APP_SHELL_FILENAME}', etc.)")
+    print("  1: Simple Single File (app.hpy + hpy.toml)")
+    print("  2: Full Project (App Shell, Layout, Examples, and Component Demo)")
+    print("  3: Blank Project (App Shell, Minimal Layout)")
     
     choice = "";
     while choice not in ["1", "2", "3"]:
