@@ -7,7 +7,7 @@ import traceback
 import shutil
 import os
 import re
-import uuid # --- NEW ---
+import uuid
 from pathlib import Path
 from typing import Dict, Optional, List, Tuple, Any, Set
 
@@ -25,7 +25,6 @@ from .components import ComponentRegistry, PROPS_REGEX
 
 COMPONENT_PLACEHOLDER_REGEX = re.compile(re.escape(COMPONENT_PLACEHOLDER_PREFIX) + r"([0-9a-f\-]+)" + re.escape(COMPONENT_PLACEHOLDER_SUFFIX))
 
-# --- HELPER_FUNCTION_CODE and LIVE_RELOAD_SCRIPT remain unchanged ---
 HELPER_FUNCTION_CODE = textwrap.dedent("""
     # --- HPY Tool Helper Functions (Injected) ---
     from browser import document
@@ -109,12 +108,11 @@ def _replace_title_in_app_shell(app_shell_html: str, new_title: Optional[str]) -
         if head_end_match: return app_shell_html.replace(head_end_match.group(1), f"    <title>{new_title}</title>\n{head_end_match.group(1)}", 1)
     return app_shell_html
 
-# --- MODIFIED: Recursive Rendering Function with Style Scoping ---
 def _render_content_recursively(
     content_to_render: str,
     component_data_map: Dict[str, Any],
     component_registry: ComponentRegistry,
-    scoped_styles_collection: List[str], # MODIFIED: To collect scoped styles
+    scoped_styles_collection: List[str],
     props: Optional[Dict[str, str]] = None,
     verbose: bool = False,
     max_depth: int = 10
@@ -133,9 +131,7 @@ def _render_content_recursively(
     def render_match(match):
         placeholder_id = match.group(1)
         component_instance = component_data_map.get(placeholder_id)
-        if not component_instance:
-            if verbose: print(f"Warning: Component placeholder ID '{placeholder_id}' not found.", file=sys.stderr)
-            return ""
+        if not component_instance: return ""
 
         comp_name, comp_props = component_instance["name"], component_instance["props"]
         comp_path = component_registry.get_path(comp_name)
@@ -144,42 +140,40 @@ def _render_content_recursively(
         try:
             comp_parsed_data = parse_hpy_file(str(comp_path), is_layout=False, verbose=verbose)
             comp_html_fragment = comp_parsed_data['html']
-            comp_style_content = comp_parsed_data.get('style')
+            
+            all_comp_styles = []
+            if comp_parsed_data.get('style'):
+                all_comp_styles.append(comp_parsed_data['style'])
+            
+            for href in comp_parsed_data.get('css_links', []):
+                source_css_file = (comp_path.parent / href).resolve()
+                if not source_css_file.is_file():
+                    raise FileNotFoundError(f"In component '{comp_name}', CSS file '{href}' not found at '{source_css_file}'")
+                all_comp_styles.append(source_css_file.read_text(encoding='utf-8'))
 
-            # --- NEW: Style Scoping Logic ---
             unique_id = f"hpy-c-{uuid.uuid4().hex[:8]}"
             scoped_html = comp_html_fragment
             
-            if comp_style_content:
-                # 1. Rewrite CSS selectors to be scoped
-                # NOTE: This regex is simple and will NOT handle complex selectors like @media queries correctly.
-                # A proper CSS parser library is the correct long-term solution.
+            if all_comp_styles:
+                comp_style_content = "\n\n".join(all_comp_styles)
                 def scope_selector(m):
                     selector = m.group(1).strip()
-                    # Add scope to each part of a comma-separated selector list
                     scoped_selectors = [f"{s.strip()}[data-hpy-id='{unique_id}']" for s in selector.split(',')]
                     return ", ".join(scoped_selectors) + m.group(2)
-
+                
                 scoped_css = re.sub(r'([^{,]+)(\s*\{)', scope_selector, comp_style_content)
                 scoped_styles_collection.append(f"/* Scoped styles for <{comp_name}> ({unique_id}) */\n{scoped_css}")
+                
+                # --- THE FIX ---
+                # Tag ALL elements in the fragment, not just the first one.
+                # Remove count=1 to apply to all occurrences.
+                scoped_html = re.sub(r'<([a-zA-Z0-9]+)', rf'<\1 data-hpy-id="{unique_id}"', scoped_html)
+                # --- END FIX ---
 
-                # 2. Tag the root HTML element with the unique ID
-                # NOTE: This regex is simple and only tags the first element. It will not work correctly
-                # if a component returns multiple root elements or just text.
-                # An HTML parser library is the correct long-term solution.
-                scoped_html = re.sub(r'<([a-zA-Z0-9]+)', rf'<\1 data-hpy-id="{unique_id}"', scoped_html, count=1)
-
-            # --- END: Style Scoping Logic ---
-
-            # Recursive call to render components *within* the current component
             return _render_content_recursively(
-                scoped_html, 
-                comp_parsed_data.get('components', {}),
-                component_registry,
-                scoped_styles_collection,
-                props=comp_props,
-                verbose=verbose,
-                max_depth=max_depth - 1
+                scoped_html, comp_parsed_data.get('components', {}),
+                component_registry, scoped_styles_collection, props=comp_props,
+                verbose=verbose, max_depth=max_depth - 1
             )
         except Exception as e:
             if verbose: traceback.print_exc()
@@ -195,7 +189,7 @@ def build_output_html(
     page_head_fragment: str,
     page_body_fragment: str,
     combined_style_content: str,
-    scoped_styles_content: str, # MODIFIED
+    scoped_styles_content: str,
     final_css_links_for_html: List[str],
     layout_python_script_tag: Optional[str],
     page_python_script_tag: Optional[str],
@@ -203,7 +197,6 @@ def build_output_html(
     is_dev_watch_mode: bool = False,
     is_production_build: bool = False
 ) -> str:
-    # --- This function is MODIFIED to accept and inject scoped styles ---
     output_file_path = Path(output_file_path_str)
     try: output_file_path.parent.mkdir(parents=True, exist_ok=True)
     except OSError as e: raise OSError(f"Could not create output dir {output_file_path.parent}: {e}") from e
@@ -215,7 +208,6 @@ def build_output_html(
     css_link_tags = [f'<link rel="stylesheet" href="{href}">' for href in final_css_links_for_html]
     final_css_links_str = "\n    ".join(css_link_tags) if css_link_tags else ""
     
-    # --- NEW: Prepare scoped styles for injection ---
     scoped_styles_injection = ""
     if scoped_styles_content:
         scoped_styles_injection = f"<style id='_hpy_scoped_styles'>\n{scoped_styles_content}\n</style>"
@@ -227,7 +219,6 @@ def build_output_html(
         if final_page_title: page_head_fragment = re.sub(r"<title.*?</title>", "", page_head_fragment, count=1, flags=re.IGNORECASE | re.DOTALL)
         temp_html = re.sub(r"brython\s*\(\s*{[^}]*'debug'\s*:\s*\d+\s*[^}]*}\s*\)", f"brython({{'debug': {brython_debug_level}}})", temp_html, flags=re.IGNORECASE)
         
-        # Inject everything into the head placeholder
         head_injection_content = (final_css_links_str + "\n    " + page_head_fragment.strip() + "\n    " + scoped_styles_injection).strip()
         temp_html = temp_html.replace(APP_SHELL_HEAD_PLACEHOLDER, head_injection_content)
         temp_html = temp_html.replace(APP_SHELL_BODY_PLACEHOLDER, page_body_fragment)
@@ -245,7 +236,6 @@ def build_output_html(
     except IOError as e: raise IOError(f"Could not write to output file {output_file_path}: {e}") from e
     return str(output_file_path)
 
-# --- MODIFIED: compile_hpy_file now orchestrates style scoping ---
 def compile_hpy_file(
     input_file_path_str: str,
     output_file_path_str: str,
@@ -267,7 +257,8 @@ def compile_hpy_file(
         page_html_fragment = page_parsed_data['html']
         page_components = page_parsed_data.get('components', {})
         page_html_rendered = _render_content_recursively(
-            page_html_fragment, page_components, component_registry, scoped_styles_collection, verbose=verbose
+            page_html_fragment, page_components, component_registry, 
+            scoped_styles_collection, verbose=verbose
         )
 
         page_head_direct_content = page_parsed_data.get('head_content', "") or ""
@@ -307,7 +298,8 @@ def compile_hpy_file(
                 raise ValueError(f"Layout file '{LAYOUT_FILENAME}' is missing '{LAYOUT_PLACEHOLDER}'.")
             
             layout_body_rendered = _render_content_recursively(
-                layout_body_template, layout_components, component_registry, scoped_styles_collection, verbose=verbose
+                layout_body_template, layout_components, component_registry, 
+                scoped_styles_collection, verbose=verbose
             )
 
             final_body_content = layout_body_rendered.replace(LAYOUT_PLACEHOLDER, page_html_rendered)
@@ -332,31 +324,25 @@ def compile_hpy_file(
 
 def _copy_static_assets(input_dir: Path, output_dir: Path, config: Dict, verbose: bool = False):
     static_dir_name = config.get("static_dir_name")
-    if not static_dir_name:
-        if verbose: print("Static asset handling disabled (no 'static_dir_name' in config).")
-        return
+    if not static_dir_name: return
     source_static_dir = (input_dir / static_dir_name).resolve()
     target_static_dir = (output_dir / static_dir_name).resolve()
     if source_static_dir.is_dir():
-        if verbose: print(f"Copying static assets from '{source_static_dir.relative_to(Path.cwd())}' to '{target_static_dir.relative_to(Path.cwd())}'...")
+        if verbose: print(f"Copying static assets from '{source_static_dir.relative_to(Path.cwd())}'...")
         shutil.copytree(source_static_dir, target_static_dir, dirs_exist_ok=True)
     elif verbose: print(f"No static directory found at '{source_static_dir}', skipping asset copy.")
 
 def copy_and_inject_py_script(py_file: Path, output_py_path: Path, verbose: bool = False):
     try:
-        if verbose: print(f"  Processing external script: {py_file.name}")
+        if verbose: print(f"  Processing script: {py_file.name}")
         original_content = py_file.read_text(encoding='utf-8')
         if HELPER_FUNCTION_CODE.strip() not in original_content:
             final_content = HELPER_FUNCTION_CODE + "\n# --- Original User Code Below ---\n" + original_content
-        else:
-            final_content = original_content
+        else: final_content = original_content
         output_py_path.parent.mkdir(parents=True, exist_ok=True)
         output_py_path.write_text(final_content, encoding='utf-8')
-        if verbose: print(f"  Processed script: {py_file.name} -> {output_py_path.relative_to(output_py_path.parent.parent)}")
-    except IOError as e: print(f"Error reading/writing script '{py_file.name}' -> '{output_py_path.name}': {e}", file=sys.stderr); raise 
-    except Exception as e: print(f"Unexpected error processing script {py_file.name}: {e}", file=sys.stderr); raise
+    except IOError as e: print(f"Error reading/writing script '{py_file.name}': {e}", file=sys.stderr); raise 
 
-# --- MODIFIED: compile_directory now passes component registry correctly ---
 def compile_directory(
     input_dir_str: str, output_dir_str: str, verbose: bool = False, 
     is_dev_watch_mode: bool = False, is_production_build: bool = False
@@ -403,12 +389,10 @@ def compile_directory(
             relative_hpy_path = hpy_file.relative_to(input_dir)
             output_html_path = output_dir / relative_hpy_path.with_suffix('.html')
             
-            # --- Asset Handling Logic ---
             external_script_src, source_py_to_copy, output_py_path = None, None, None
             explicit_src = page_parsed_data.get('script_src')
             if explicit_src:
                 source_py_to_copy = (hpy_file.parent / explicit_src).resolve()
-                if not source_py_to_copy.is_file(): raise FileNotFoundError(f"Script '{explicit_src}' in '{hpy_file.name}' not found.")
                 rel_py_path = source_py_to_copy.relative_to(input_dir)
                 output_py_path = (output_dir / rel_py_path).resolve()
                 external_script_src = os.path.relpath(output_py_path, start=output_html_path.parent)
@@ -425,12 +409,14 @@ def compile_directory(
 
             page_css_hrefs = page_parsed_data.get('css_links', [])
             layout_css_hrefs = layout_parsed_data.get('css_links', []) if layout_parsed_data else []
-            all_css_sources = [(href, layout_file_path.parent) for href in layout_css_hrefs] + [(href, hpy_file.parent) for href in page_css_hrefs]
+            page_level_css_sources = set()
+            for href in page_css_hrefs: page_level_css_sources.add((hpy_file.parent / href).resolve())
+            if layout_parsed_data:
+                for href in layout_css_hrefs: page_level_css_sources.add((layout_file_path.parent / href).resolve())
             
             final_css_links_for_html = []
-            for href, base_path in dict.fromkeys(all_css_sources):
-                source_css_file = (base_path / href).resolve()
-                if not source_css_file.is_file(): raise FileNotFoundError(f"CSS file '{href}' not found.")
+            for source_css_file in sorted(list(page_level_css_sources)):
+                if not source_css_file.is_file(): raise FileNotFoundError(f"CSS file '{source_css_file}' not found.")
                 rel_css_path = source_css_file.relative_to(input_dir)
                 output_css_path = (output_dir / rel_css_path).resolve()
 
@@ -441,7 +427,6 @@ def compile_directory(
                 
                 final_css_links_for_html.append(os.path.relpath(output_css_path, start=output_html_path.parent).replace(os.sep, '/'))
             
-            # --- Final call to compile the page ---
             compile_hpy_file(
                 str(hpy_file), str(output_html_path), component_registry, app_shell_template_content, layout_parsed_data,
                 page_parsed_data, external_script_src, final_css_links_for_html,
@@ -457,8 +442,8 @@ def compile_directory(
         print(f"\n--- Build Summary ---")
         print(f"Mode: {'Production' if is_production_build else 'Development'}")
         print(f"Processed: {len(hpy_files_to_process)} page file(s).")
-        if processed_assets['py']: print(f"External Python scripts processed: {len(processed_assets['py'])}")
-        if processed_assets['css']: print(f"Linked CSS assets processed: {len(processed_assets['css'])}")
+        if processed_assets['py']: print(f"Python scripts processed: {len(processed_assets['py'])}")
+        if processed_assets['css']: print(f"Global CSS assets copied: {len(processed_assets['css'])}")
         if static_dir_name and (input_dir / static_dir_name).exists(): print(f"Static assets handled from: '{static_dir_name}'")
         if not failed_files: print(f"Status: SUCCESS")
         else: print(f"Status: FAILURE ({len(failed_files)} error(s))", file=sys.stderr); print(f"Failed items: {', '.join(failed_files)}", file=sys.stderr)

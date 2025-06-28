@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hpy-tool"
 # Sync version with hpy_core/config.py
-version = "0.8.2" # Updated Version for App Shell + Init Refactor
+version = "0.8.2" 
 authors = [
   { name="xdmanus", email="xdmanus.dev@gmail.com" },
 ]
@@ -16,7 +16,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: BSD License", # Standardized SPDX identifier
+    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Build Tools",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
@@ -24,13 +24,12 @@ classifiers = [
 dependencies = [
     'tomli >= 1.1.0',
     'watchfiles >= 0.18',
-    'typer[all] >= 0.9.0' # Or latest; [all] installs rich for pretty printing
+    'typer[all] >= 0.9.0',
+    'beautifulsoup4 >= 4.9.0' # NEW: For robust HTML parsing
 ]
 
 [project.scripts]
 hpy = "hpy_core.cli:main"
 
-# --- NEW SECTION FOR PACKAGING TEMPLATE FILES ---
 [tool.setuptools.package-data]
-hpy_core = ["project_templates/*.*"]
-# --- END NEW SECTION ---
+hpy_core = ["project_templates/*.*"] # Ensure component templates are packaged
